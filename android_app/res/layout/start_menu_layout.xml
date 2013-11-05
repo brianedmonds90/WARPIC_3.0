@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/AbsoluteLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="An image manipulation and animation tool"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="8dp"
+        android:layout_y="32dp"
+        android:text="A product of the Georgia Tech Graphics lab" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="10dp"
+        android:layout_y="60dp"
+        android:text="Built by Brian Edmonds" />
+
+    <Button
+        android:id="@+id/warpFromCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="21dp"
+        android:layout_y="90dp"
+        android:text="Begin Warping from Camera" />
+
+    <Button
+        android:id="@+id/credits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="14dp"
+        android:layout_y="168dp"
+        android:text="Credits" />
+
+    <Button
+        android:id="@+id/loadImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="120dp"
+        android:layout_y="166dp"
+        android:text="Load an Image" />
+
+    <Button
+        android:id="@+id/tutorialVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_x="294dp"
+        android:layout_y="88dp"
+        android:text="Tutorial Video" />
+
+</AbsoluteLayout>
