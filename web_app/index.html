@@ -60,18 +60,16 @@ function test(){
   var query = new Parse.Query(TestObject);
   var id = window.location.search.substring(1);
   query.get(id, {
-      success: function(testObj) {
-        // The object was retrieved successfully.
-        console.log(testObj.attributes.brain);
-        var processingInstance=Processing.getInstanceById('WARPICWEBM');
-        processingInstance.loadMotion(testObj.attributes.brain);
-        var image_url = (testObj.get("imageFile").url());
-       	//processingInstance.myImage= processingInstance.loadImage(image_url);
-	console.log(image_url);
+  	success: function(testObj) {
+    // The object was retrieved successfully.
+    // console.log(testObj.attributes.brain);
+    var processingInstance=Processing.getInstanceById('WARPICWEBM');
+    processingInstance.loadMotion(testObj.attributes.brain);
+    var image_url = (testObj.get("imageFile").url());
+    //processingInstance.myImage= processingInstance.loadImage(image_url);
 	processingInstance.loadMyImage(image_url);
-//	var image_tag=document.getElementById('image_tag');
-//	image_tag.crossDomain='anonymous';
-//	image_tag.src=image_url;
+
+
       },
       error: function(object, error) {
       // The object was not retrieved successfully.
@@ -79,14 +77,14 @@ function test(){
       }
     });
 }
-
+	
 function test_debug(id){
   var TestObject = Parse.Object.extend("TestObject");
   var query = new Parse.Query(TestObject);
   query.get(id, {
       success: function(testObj) {
         // The object was retrieved successfully.
-        console.log(testObj.attributes.brain);
+      //  console.log(testObj.attributes.brain);
          // Processing.getInstanceById('WARPICWEBM').loadMotion(testObj.attributes.brain);
         
       },
@@ -98,6 +96,17 @@ function test_debug(id){
 }
 
 window.onload=test;
+
+function savePicture(){
+	var processingInstance=Processing.getInstanceById('WARPICWEBM');
+	var link=document.createElement("a");
+	link.appendChild(document.createTextNode("Link"+id));
+	link.href = processingInstance.save('');
+	document.body.appendChild(link);
+}
+
+
+
 
 </script>
 	</head>
@@ -121,6 +130,10 @@ window.onload=test;
 			Built with <a href="http://processing.org" title="Processing">Processing</a>
 			and <a href="http://processingjs.org" title="Processing.js">Processing.js</a>
 			</p>
+			<button type="button" onClick="savePicture()">Download Frames</button>
 		</div>
 	</body>
 </html>
+
+
+

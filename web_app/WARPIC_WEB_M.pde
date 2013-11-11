@@ -162,7 +162,10 @@ void animateUpdate1(int index) {//used to traverse through the users previous fi
 int pictureCounter=0;
 import java.util.Scanner;
 void snapPicture() {
-  saveFrame("PICTURES/P"+nf(pictureCounter++, 3)+".jpg");
+  console.log("insde snap picture Brian Edmonds");
+  //saveFrame("PICTURES/P"+nf(pictureCounter++, 3)+".jpg");
+  //saveFrame();
+  console.log(save("testPic.png"));
 }
 Scanner scan;
 void loadPts() {
@@ -206,7 +209,7 @@ void fun(PImage img){
 void loadMyImage(String url){
 	loadImage(url,"",fun);
 	showTexture=true;
-	println("what is going on?");
+	//println("what is going on?");
 }
 
 void ptsSetup(){
@@ -354,7 +357,7 @@ class pair {
   }
   pair fromStringList(ArrayList<String> ss) {
     pair ret= new pair(new pt(0, 0), new pt(0, 0), new pt(0, 0), new pt(0, 0)); 
-    println("ss.size()"+ss.size());
+    //println("ss.size()"+ss.size());
     int comma;
     ArrayList <pt> myPts= new ArrayList<pt>();
     float x, y;
