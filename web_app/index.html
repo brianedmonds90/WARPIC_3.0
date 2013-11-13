@@ -100,15 +100,27 @@ window.onload=test;
 function savePicture(){
 	var processingInstance=Processing.getInstanceById('WARPICWEBM');
 	var link=document.createElement("a");
-	link.appendChild(document.createTextNode("Link"+id));
-	link.href = processingInstance.save('');
+	link.appendChild(document.createTextNode("Link"));
+	var str= processingInstance.save('');
+	console.log(str);
+	//console.log(processingInstance.save(''));
+	link.href = str;
 	document.body.appendChild(link);
 }
-
-
-
+function generateZip(){
+	var zip = new JSZip();
+	zip.file("Hello.txt", "Hello World\n");
+	var img = zip.folder("images");
+	var imgData= "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMUlEQVRYR+3QQQ0AAAwCMfAvepuLfUpOAGknuf5WBwgQIECAAAECBAgQIECAAIFvgQWlvj/hfisQewAAAABJRU5ErkJggg=="; 
+	img.file("smile.png", imgData, {base64: true});
+	var content = zip.generate();
+	location.href="data:application/zip;base64,"+content;
+ }
 
 </script>
+<script src="jszip.js">
+</script>
+
 	</head>
 	<body>
 		<div id="content">
@@ -131,6 +143,7 @@ function savePicture(){
 			and <a href="http://processingjs.org" title="Processing.js">Processing.js</a>
 			</p>
 			<button type="button" onClick="savePicture()">Download Frames</button>
+			<button type="button" onClick="generateZip()">Generate Zip</button>
 		</div>
 	</body>
 </html>
