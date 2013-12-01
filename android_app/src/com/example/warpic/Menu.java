@@ -3,7 +3,7 @@ package com.example.warpic;
 import processing.core.PApplet;
 
 class Menu {
-	  Button playAnimation, sendAnimation;
+	  Button playAnimation, sendAnimation, showSpirals,showEdges;
 	  int menuH;
 	  int menuW;
 	  WarpicActivity myPa;
@@ -11,6 +11,8 @@ class Menu {
 	  Menu(WarpicActivity pa) {
 		sendAnimation=new Button("Send Animation Files", 500,500, pa);
 		playAnimation=new Button("Play Animation",500,500,pa);
+		showSpirals = new Button("Show Spirals", 500,500,pa);
+		showEdges = new Button("ShowEdges", 500,500,pa);
 		myPa= pa;
 		reArrange();
 	    
@@ -21,6 +23,10 @@ class Menu {
 		  sendAnimation.y= myPa.height-sendAnimation.bHeight;
 		  playAnimation.x=sendAnimation.bWidth;
 		  playAnimation.y= myPa.height-playAnimation.bHeight;
+		  showSpirals.x=playAnimation.x+playAnimation.bWidth;
+		  showSpirals.y=myPa.height-playAnimation.bHeight;
+		  showEdges.x= 0;
+		  showEdges.y= sendAnimation.y-showEdges.bHeight;
 		  
 	  }
 	  
@@ -28,11 +34,15 @@ class Menu {
 		  //draw the buttons here
 		  sendAnimation.draw(pa);
 		  playAnimation.draw(pa);
+		  showSpirals.draw(pa);
+		  showEdges.draw(pa);
 	  }
 	 
 	  void buttonPressed(Pt p) {
 		  sendAnimation.pressed(p);
 		  playAnimation.pressed(p);
+		  showSpirals.pressed(p);
+		  showEdges.pressed(p);
 		
 	  }
 	  
@@ -46,6 +56,14 @@ class Menu {
 		  }
 		  else if(playAnimation.pressed)
 			 myPa.timeToAnimate();
+		  else if(showSpirals.pressed){
+			  //myPa.launchMotionGallery();
+			  myPa.showSpirals=!myPa.showSpirals;
+		  }
+		  else if(showEdges.pressed){
+			  myPa.showEdges=!myPa.showEdges;
+		  }
+		  
 		  unPressAll();
 		  
 	  }
@@ -53,6 +71,8 @@ class Menu {
 	  private void unPressAll() {
 		  sendAnimation.pressed=false;
 		  playAnimation.pressed=false;
+		  showSpirals.pressed=false;
+		  showEdges.pressed=false;
 	  }
 
 	  public void motion(MyMotionEvent me) {

@@ -5,6 +5,7 @@ white = color(255);
 boolean onStartup, cameraPreview, pictureTaken, showPicForWarping, selectFile, fingersOnScreen, 
 animate, record, startTimer, showController, firstRun, ptsLoaded, showSpirals;
 PImage myImage;
+int numFrames;
 
 ArrayList<pt> A, B, C, D; //Declare finger movement list
 int deviceDisplayW, deviceDisplayH;
@@ -17,6 +18,8 @@ int offsetW, offsetH;
 int startMillis;
 boolean start;
 float ellapsedTime;
+boolean saveAnimationURI=false;
+ArrayList<String> uris;
 
 void setup() {
   size(800, 600,P3D); 
@@ -55,6 +58,7 @@ void setup() {
   allocVertices(); // ML: alloc all grid points before starting animation
   initArrays();
   start=true;
+  
   //Motion Data is grabbed here
   //motionSelected("motion.txt");
   
@@ -66,18 +70,16 @@ void draw() {
   if(start){
     startMillis=millis();
     start=false;
+    numFrames = max(max(A.size(),B.size()),max(C.size(),D.size()));
    // println("currentMillis: "+startMillis);
   }
   
-  //println(ellapsedTime);
-
- // if(frameCount%10 == 0) 
-  //  println("frameRate: "+frameRate); // ML: added framerate counter
-    
   background(255);
   resetVertices(); 
+  double currentT= millis()-startMillis;
+  currentT=currentT/1000.0;
   if (animate) {
-    animateWarping();
+    animateWarping(currentT);
   }
 
   //End of animation loop
@@ -89,6 +91,7 @@ void draw() {
 
   if (showEdges) drawEdges();
   if(showTexture) paintImage(myImage); 
+
 //image(myImage,0,0);
 	
 }//end of draw loop
@@ -120,13 +123,8 @@ void saveWarp() {//Bakes the warped image as a PImage
   loop();
 }
 
-void animateWarping() {
-  int numFrames = max(max(A.size(),B.size()),max(C.size(),D.size()));
-  double currentT= millis()-startMillis;
-  currentT=currentT/1000.0;
+void animateWarping(double currentT) {
   tracking=computeAnimationFrame(currentT, ellapsedTime, numFrames);
- // println(currentT);
-
   animateUpdate1(tracking);//Advance the current pairs along the user's path
   roi=d(L.ctr(), R.ctr()); //Find the region of influence for the warping
   L.evaluate(f);
@@ -135,9 +133,11 @@ void animateWarping() {
   warpVertices1(R, f, roi);
   tracking++; 
   f=1;
+
   if (tracking>numFrames) {
     tracking=0;
     start=true;
+    
   }
 }
 
@@ -209,7 +209,7 @@ void fun(PImage img){
 void loadMyImage(String url){
 	loadImage(url,"",fun);
 	showTexture=true;
-	//println("what is going on?");
+
 }
 
 void ptsSetup(){
@@ -220,6 +220,11 @@ void ptsSetup(){
     showEdges=false;
       showTexture=true;
     }  
+}
+
+void generate_uri(){
+   saveAnimationURI=true;
+   tracking=0;
 }
 
 //Takes in the finger motion lists and adds them to the user motion paths

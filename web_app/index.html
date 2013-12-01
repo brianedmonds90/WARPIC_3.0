@@ -102,12 +102,26 @@ function savePicture(){
 	var link=document.createElement("a");
 	link.appendChild(document.createTextNode("Link"));
 	var str= processingInstance.save('');
-	console.log(str);
-	//console.log(processingInstance.save(''));
+	str=str.substring(str.indexOf(","),str.length);
+	generate_zip(str,0);
 	link.href = str;
 	document.body.appendChild(link);
 }
-function generateZip(){
+
+function generate_uris(){
+	var processingInstance=Processing.getInstanceById('WARPICWEBM');
+	var num_frames= processingInstance.numFrames;
+	var i=0;
+	while(i<num_frames){
+		processingInstance.draw();
+		var str= processingInstance.save('');
+		str=str.substring(str.indexOf(","),str.length);
+		//add str to some list
+	}
+	savePicture();
+}
+
+function generate_zip_test(){
 	var zip = new JSZip();
 	zip.file("Hello.txt", "Hello World\n");
 	var img = zip.folder("images");
@@ -116,6 +130,18 @@ function generateZip(){
 	var content = zip.generate();
 	location.href="data:application/zip;base64,"+content;
  }
+
+ function generate_zip(str,id){
+	var zip = new JSZip();
+	zip.file("Hello.txt", "Hello World\n");
+	var img = zip.folder("images");
+	var imgData= str; 
+	img.file("image"+id+".png", imgData, {base64: true});
+	var content = zip.generate();
+	location.href="data:application/zip;base64,"+content;
+ }
+
+
 
 </script>
 <script src="jszip.js">
@@ -143,7 +169,7 @@ function generateZip(){
 			and <a href="http://processingjs.org" title="Processing.js">Processing.js</a>
 			</p>
 			<button type="button" onClick="savePicture()">Download Frames</button>
-			<button type="button" onClick="generateZip()">Generate Zip</button>
+			<button type="button" onClick="generate_uris()">Generate Zip</button>
 		</div>
 	</body>
 </html>

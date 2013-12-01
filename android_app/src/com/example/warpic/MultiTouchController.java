@@ -16,6 +16,7 @@ class MultiTouchController {// Used to process the android API touch events for
 
 	ArrayList<MultiTouch> mTContainer;// Container for MultiTouch objects
 	Menu menu;
+	MotionPath canned_motion_path;
 	double initTime, liftTime, elapsedTime;
 	boolean recordTime;
 
@@ -41,6 +42,12 @@ class MultiTouchController {// Used to process the android API touch events for
 		this();
 		menu = myMenu;
 	}
+	
+	MultiTouchController(Menu myMenu,MotionPath mPath) {
+		this();
+		menu = myMenu;
+		canned_motion_path= mPath;
+	}
 
 	public void init() {// Puts disk objects on the screen to be moved around
 		mTContainer.add(new MultiTouch(300, 100));
@@ -51,7 +58,7 @@ class MultiTouchController {// Used to process the android API touch events for
 
 	public void touch(MyMotionEvent ev) {// Method used when a touch event
 											// happens
-		Pt cTouch = new Pt(ev.loc.x, ev.loc.y, 0);
+		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
 		MultiTouch finger;
 		if (recordTime) {
 			initTime = ev.nanoTime / 1000000000.0;
@@ -278,6 +285,53 @@ class MultiTouchController {// Used to process the android API touch events for
 
 	double getElapsedTime() {
 		return elapsedTime;
+	}
+
+	public void handleCannedWarpEdit(MyMotionEvent me) {
+		
+		if (me.action == 1) {// The user has touched the screen
+			touchCanned(me); // Register the touch event
+		} else if (me.action == 0) {// The user has lifted their fingers from
+									// the screen
+			// Register the lift event
+			liftCanned(me);
+		} else {
+			motionCanned(me);// Register the motion event
+		}
+	}
+
+	private void liftCanned(MyMotionEvent me) {
+		canned_motion_path.currentTouch= new Pt();
+		canned_motion_path.prevTouch= new Pt();
+		
+	}
+
+	private void motionCanned(MyMotionEvent me) {
+		if(me.pointerCount==1){
+			canned_motion_path.currentTouch = me.loc;
+			canned_motion_path.displace();
+			canned_motion_path.prevTouch=canned_motion_path.currentTouch;
+		}
+		else if(me.pointerCount>1){
+			motion(me);
+		}
+	
+	}
+
+	private void touchCanned(MyMotionEvent me) {
+		
+		if(me.pointerCount>1){
+			canned_motion_path.prevTouch_1 = me.loc;
+		}
+		else if(me.pointerCount==1){
+//			canned_motion_path.prevTouch = me.loc;
+			touch(me);
+		}
+	}
+
+	public void scale(MotionPath smile) {
+		//TODO: write this code
+		
 	}
 
 }
