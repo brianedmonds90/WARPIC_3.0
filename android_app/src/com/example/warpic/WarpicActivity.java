@@ -31,7 +31,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	int n = 50; // size of grid. Must be >2!
 	Pair initL, initR;
 	Pt[][] G = new Pt[n][n]; // array of vertices
-	boolean showVertices = false, showEdges = true, showTexture = false; // flags
+	boolean showVertices = false, showEdges = false, showTexture = false; // flags
 																		// for
 																		// rendering
 																		// vertices
@@ -74,7 +74,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	private boolean cannedWarp = false;
 	public static boolean setL_R_prime;
 	public Pair currentTouch= new Pair();
-
+	public Barycentric_Coords bary_coords;
+	
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
@@ -135,22 +136,23 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		r_prime = new Pair();
 		L= new Pair();
 		R= new Pair();
+	
 	}
 
 	public void draw() {
 		background(255);
 		synchronized (l) {// handle the previously queued motion events
-			if (!showMenu) {
+			if (!showMenu&&!cannedWarp) {
 				for (MyMotionEvent me : l) {
 					mController.handle(me);
 				}
 			} 
-//			else if (cannedWarpEdit) {
-//				for (MyMotionEvent me : l) {
-//					mController.handleCannedWarpEdit(me);
-//				}
-//			} 
-			else {
+			else if(cannedWarp&&!showMenu){
+				for(MyMotionEvent me : l){
+					mController.handle_triangle(me);
+				}
+			}
+			else if(showMenu){
 				for (MyMotionEvent me : l)
 					// Register the button input
 					mController.handleButton(me);
@@ -164,9 +166,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}
 		
 //		
-//		if (cannedWarpEdit) {
-//			mController.scale(smile);
-//		}
+
 
 //		stroke(0, 0, 255);
 //		show(smile.currentTouch);
@@ -272,8 +272,17 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 //			}
 //		}
 		if(showCannedWarp){
+			this.noFill();
+			this.strokeWeight(6);
 			this.stroke(255,0,0);
 			effects_path.showPaths(this);
+		}
+		if(cannedWarp){
+			this.noFill();
+			this.stroke(0,0,255);
+			this.strokeWeight(6);
+	//		bary_coords.show(this);
+			mController.show(this);
 		}
 		//
 	}// End of draw
@@ -442,9 +451,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			}
 		} else if (action == 0) {
 			if (pointerCount == 1) {
-				if (fingersOnScreen && firstPass){
+				if (fingersOnScreen && firstPass&&!cannedWarp){
 					createNewController = true;
-					
 				}
 					
 			}
@@ -1130,5 +1138,13 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		R.A0.setTo(effects_path.C.get(0));
 		R.B0.setTo(effects_path.D.get(0));
 		ellapsed_time=5;
+		showCannedWarp=true;
+		
+		//Assign the barycentric coords
+	//	bary_coords = new Barycentric_Coords(new Pt(100,100), new Pt(100, 400),new Pt(300, 400));
+		
+		mController= new MultiTouchController(new Pt(100,100),new Pt(100,100),new Pt(100,100),menu);
 	}
+	
+	
 }

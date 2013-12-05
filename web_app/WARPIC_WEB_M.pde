@@ -302,7 +302,7 @@ void printArray(String [] ss) {
   }
 }
 void myResize(PImage img) {
-  img.resize(800, 0);
+  img.resize(1280, 0);
 }
 void initArrays() {
 

@@ -49,6 +49,13 @@ class MultiTouchController {// Used to process the android API touch events for
 		canned_motion_path= mPath;
 	}
 
+	public MultiTouchController(Pt a, Pt b, Pt c, Menu myMenu) {
+		this(myMenu);
+		mTContainer.add(new MultiTouch(a.x,a.y));
+		mTContainer.add(new MultiTouch(b.x,b.y));
+		mTContainer.add(new MultiTouch(c.x, c.y));
+	}
+
 	public void init() {// Puts disk objects on the screen to be moved around
 		mTContainer.add(new MultiTouch(300, 100));
 		mTContainer.add(new MultiTouch(300, 400));
@@ -59,7 +66,6 @@ class MultiTouchController {// Used to process the android API touch events for
 	public void touch(MyMotionEvent ev) {// Method used when a touch event
 										// happens
 		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
-		
 		MultiTouch finger;
 		if (recordTime) {
 			initTime = ev.nanoTime / 1000000000.0;
@@ -291,18 +297,7 @@ class MultiTouchController {// Used to process the android API touch events for
 		return elapsedTime;
 	}
 
-	public void handleCannedWarpEdit(MyMotionEvent me) {
-		
-		if (me.action == 1) {// The user has touched the screen
-			touchCanned(me); // Register the touch event
-		} else if (me.action == 0) {// The user has lifted their fingers from
-									// the screen
-			// Register the lift event
-			liftCanned(me);
-		} else {
-			motionCanned(me);// Register the motion event
-		}
-	}
+
 
 	private void liftCanned(MyMotionEvent me) {
 		canned_motion_path.currentTouch= new Pt();
@@ -310,31 +305,63 @@ class MultiTouchController {// Used to process the android API touch events for
 		
 	}
 
-	private void motionCanned(MyMotionEvent me) {
-		if(me.pointerCount==1){
-			canned_motion_path.currentTouch = me.loc;
-			canned_motion_path.displace();
-			canned_motion_path.prevTouch=canned_motion_path.currentTouch;
-		}
-		else if(me.pointerCount>1){
-			motion(me);
-		}
-	
-	}
-
-	private void touchCanned(MyMotionEvent me) {
+	private void motion_canned(MyMotionEvent me) {
 		
-		if(me.pointerCount>1){
-			canned_motion_path.prevTouch_1 = me.loc;
-		}
-		else if(me.pointerCount==1){
-//			canned_motion_path.prevTouch = me.loc;
-			touch(me);
+		MultiTouch temp = null;
+		// find the matching index within the mTContainer object
+		int j = me.pointerId; // which finger are we looking at
+		int index = indexOf(j); // what is the index of the pointer data within
+								// the mTContainer list
+		if (index != -1 && mTContainer.get(index).selected) {
+			temp = mTContainer.get(index);
+			// log the current position of the users fingers
+			temp.currentTouch = new Pt(me.loc.x, me.loc.y, 0);
+			// calculate the distance moved from the previous frame and move the
+			// point
+			temp.disk.move(temp.currentTouch.subtract(temp.lastTouch));
+			temp.lastTouch.set(temp.currentTouch);
 		}
 	}
 
-	public void scale(MotionPath smile) {
-		//TODO: write this code
+	private void touch_canned(MyMotionEvent ev){
+		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
+		MultiTouch finger;
+		
+		if (mTContainer.size() < 3) {// Adjust this number to adjust the number
+										// of fingers that you want to use
+			finger = new MultiTouch(cTouch.x, cTouch.y);
+			finger.selected = true;
+			finger.meIndex = ev.pointerId;
+			finger.lastTouch = cTouch;
+			finger.downTime = ev.nanoTime / 1000000000.0;
+			mTContainer.add(finger);
+		} 
+		else {// We have four points on the screen, the user wants to move one
+				// of them
+			MultiTouch temp = findClosest(cTouch);
+			WarpicActivity.fingersOnScreen = true;
+			if (temp != null) {
+				temp.selected = true;
+				temp.meIndex = ev.pointerId;
+				temp.downTime = ev.nanoTime / 1000000000.0;
+				temp.lastTouch = cTouch; // Keep track of the touch location for
+											// movement
+			}
+		}
+	}
+
+	public void handle_triangle(MyMotionEvent me) {
+		if (me.action == 1) {// The user has touched the screen
+
+			touch_canned(me); // Register the touch event
+		} else if (me.action == 0) {// The user has lifted their fingers from
+									// the screen
+			// Register the lift event
+			//lift(me);
+			System.out.println("Filler");
+		} else {
+			motion_canned(me);
+		}
 		
 	}
 

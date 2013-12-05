@@ -59,7 +59,7 @@ class Pt {
   Pt add(float s, Pt P)   {x += s*P.x; y += s*P.y; return this;};               // adds s*P
 //  Pt add(Vec V) {x += V.x; y += V.y; return this;}                              // P.add(V): P+=V
 //  Pt add(float s, Vec V) {x += s*V.x; y += s*V.y; return this;}                 // P.add(s,V): P+=sV
-//    Pt v() {vertex(x,y); return this;};  // used for drawing polygons between beginShape(); and endShape();
+    Pt v(WarpicActivity wp) {wp.vertex(x,y); return this;};  // used for drawing polygons between beginShape(); and endShape();
 
   void set(Pt p){
    this.x=p.x;

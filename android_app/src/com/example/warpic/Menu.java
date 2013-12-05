@@ -3,7 +3,7 @@ package com.example.warpic;
 import processing.core.PApplet;
 
 class Menu {
-	  Button playAnimation, sendAnimation, showSpirals,showEdges, loadMotionPath;
+	  Button playAnimation, sendAnimation, showSpirals,showEdges, loadMotionPath, showTexture;
 	  int menuH;
 	  int menuW;
 	  WarpicActivity myPa;
@@ -14,6 +14,7 @@ class Menu {
 		showSpirals = new Button("Show Spirals", 500,500,pa);
 		showEdges = new Button("ShowEdges", 500,500,pa);
 		loadMotionPath = new Button("Load Motion", 500,500,pa);
+		showTexture = new Button("Show Texture", 0,0 , pa);
 		myPa= pa;
 		reArrange();
 	    
@@ -29,7 +30,9 @@ class Menu {
 		  showEdges.x= 0;
 		  showEdges.y= sendAnimation.y-showEdges.bHeight;
 		  loadMotionPath.x=showEdges.bWidth;
-		  loadMotionPath.y= sendAnimation.y-showEdges.bHeight;;
+		  loadMotionPath.y= sendAnimation.y-showEdges.bHeight;
+		  showTexture.y= sendAnimation.y-showEdges.bHeight;
+		  showTexture.x=loadMotionPath.x+loadMotionPath.bWidth;
 	  }
 	  
 	  void draw(PApplet pa) {
@@ -39,6 +42,7 @@ class Menu {
 		  showSpirals.draw(pa);
 		  showEdges.draw(pa);
 		  loadMotionPath.draw(pa);
+		  showTexture.draw(pa);
 		  
 	  }
 	 
@@ -48,6 +52,7 @@ class Menu {
 		  showSpirals.pressed(p);
 		  showEdges.pressed(p);
 		  loadMotionPath.pressed(p);
+		  showTexture.pressed(p);
 		
 	  }
 	  
@@ -71,7 +76,9 @@ class Menu {
 		  else if(loadMotionPath.pressed){
 			  myPa.launchMotionGallery();
 		  }
-		  
+		  else if(showTexture.pressed){
+			  myPa.showTexture=!myPa.showTexture;
+		  }
 		  unPressAll();
 		  
 	  }
@@ -82,6 +89,7 @@ class Menu {
 		  showSpirals.pressed=false;
 		  showEdges.pressed=false;
 		  loadMotionPath.pressed=false;
+		  showTexture.pressed=false;
 	  }
 
 	  public void motion(MyMotionEvent me) {

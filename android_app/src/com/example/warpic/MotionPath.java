@@ -37,18 +37,18 @@ public class MotionPath {
 //	}
 
 	public void showPaths(WarpicActivity wp){
-		for(Pt p: A){
-			wp.show(p);
-		}
-		for(Pt p: B){
-			wp.show(p);
-		}
-		for(Pt p: C){
-			wp.show(p);
-		}
-		for(Pt p: D){
-			wp.show(p);
-		}
+		draw(A,wp);
+		draw(B,wp);
+		draw(C,wp);
+		draw(D,wp);
+	}
+	
+	void draw(ArrayList<Pt> list, WarpicActivity wp) {
+		    wp.beginShape(); 
+		    for (int v=0; v<list.size(); v++){
+		      list.get(v).v(wp);
+		    }
+		    wp.endShape();
 	}
 	
 	public void initSmile(){
