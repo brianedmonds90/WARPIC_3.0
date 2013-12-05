@@ -1,6 +1,7 @@
 package com.example.warpic;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import processing.core.PApplet;
 
@@ -19,7 +20,6 @@ class MultiTouchController {// Used to process the android API touch events for
 	MotionPath canned_motion_path;
 	double initTime, liftTime, elapsedTime;
 	boolean recordTime;
-
 	MultiTouchController(int num) {
 		mTContainer = new ArrayList<MultiTouch>(num);
 		for (int i = 0; i < num; i++) {
@@ -57,8 +57,9 @@ class MultiTouchController {// Used to process the android API touch events for
 	}
 
 	public void touch(MyMotionEvent ev) {// Method used when a touch event
-											// happens
+										// happens
 		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
+		
 		MultiTouch finger;
 		if (recordTime) {
 			initTime = ev.nanoTime / 1000000000.0;
@@ -116,6 +117,9 @@ class MultiTouchController {// Used to process the android API touch events for
 				WarpicActivity.firstPass = false;
 				WarpicActivity.saveWarp = true;
 				WarpicActivity.grabPoints = true;
+			}
+			else if(!WarpicActivity.firstPass){
+				WarpicActivity.setL_R_prime=true;
 			}
 			WarpicActivity.fingersOnScreen = false;
 		}

@@ -120,4 +120,16 @@ class Pair {
         helper.lerpTo(Q, G, 1-helper.pow(s, ct)); // updates Q
       }
     }
+
+	public void setTo(Pair l) {
+		this.A0.setTo(l.A0);
+		this.B0.setTo(l.B0);
+		this.A1.setTo(l.A1);
+		this.B1.setTo(l.B1);
+		
+	}
+	public String toString(){
+		String ret= "A0: "+A0+"\nB0: "+B0+"\nA1: "+A1+"\nB1: "+B1;
+		return ret;
+	}
  } // end pair
