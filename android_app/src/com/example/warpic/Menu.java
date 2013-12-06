@@ -60,7 +60,7 @@ class Menu {
 		  //set all buttons pressed to false
 		  if(sendAnimation.pressed){
 			 
-			  myPa.getReadyToAnimate();
+			  myPa.getReadyToAnimate_1();
 			  myPa.addAnimationString();
 			  myPa.sendAnimation();
 		  }

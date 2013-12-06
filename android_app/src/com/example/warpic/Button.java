@@ -56,7 +56,7 @@ class Button{
     return true;
   }
   void findWidth(PApplet pa){
-    bWidth=pa.width/3;
+    bWidth=pa.width/5;
   }
   void findHeight(PApplet pa){
     bHeight=pa.height/8;
