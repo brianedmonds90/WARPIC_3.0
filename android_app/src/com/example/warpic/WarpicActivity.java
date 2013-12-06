@@ -74,7 +74,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	private boolean cannedWarp = false;
 	public static boolean setL_R_prime;
 	public Pair currentTouch= new Pair();
-	public Barycentric_Coords bary_coords;
+	public ArrayList<Weight> weights_a,weights_b,weights_c,weights_d;
 	
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
@@ -106,6 +106,13 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		C = new ArrayList<Pt>();
 		D = new ArrayList<Pt>();
 		// ******************************
+		//*****************Weight lists for Barycentric coords
+		weights_a= new ArrayList<Weight>();
+		weights_b= new ArrayList<Weight>();
+		weights_c= new ArrayList<Weight>();
+		weights_d= new ArrayList<Weight>();
+		//*****************
+		
 		showMenu = false;
 		tracking = 0;
 		counter = 0;
@@ -142,21 +149,23 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	public void draw() {
 		background(255);
 		synchronized (l) {// handle the previously queued motion events
-			if (!showMenu&&!cannedWarp) {
-				for (MyMotionEvent me : l) {
-					mController.handle(me);
+			if(showMenu){
+				for (MyMotionEvent me : l){
+					// Register the button input
+					mController.handleButton(me);
 				}
-			} 
-			else if(cannedWarp&&!showMenu){
+			}
+			else if(cannedWarp){
 				for(MyMotionEvent me : l){
 					mController.handle_triangle(me);
 				}
 			}
-			else if(showMenu){
-				for (MyMotionEvent me : l)
-					// Register the button input
-					mController.handleButton(me);
-			}
+			else {
+				for (MyMotionEvent me : l) {
+					mController.handle(me);
+				}
+			} 
+
 			l.clear(); // clear the array list
 		}// end of Synchronized
 
@@ -165,13 +174,36 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			createNewController = false;
 		}
 		
-//		
+		if(cannedWarp){
+			
+			
+			effects_path.A.clear();
+			effects_path.B.clear();
+			effects_path.C.clear();
+			effects_path.D.clear();
+			Pt v1=mController.getDiskAt(0);
+			Pt v2=mController.getDiskAt(1);
+			Pt v3=mController.getDiskAt(2);
 
-
-//		stroke(0, 0, 255);
-//		show(smile.currentTouch);
-//		stroke(0, 255, 0);
-//		show(smile.prevTouch);
+			
+			for(Weight w: weights_a){
+				effects_path.A.add(w.to_global_coords(v1, v2, v3));
+			}
+			for(Weight w: weights_b){
+				effects_path.B.add(w.to_global_coords(v1, v2, v3));
+			}
+			for(Weight w: weights_c){
+				effects_path.C.add(w.to_global_coords(v1, v2, v3));
+			}
+			for(Weight w: weights_d){
+				effects_path.D.add(w.to_global_coords(v1, v2, v3));
+			}
+			L.A0.setTo(effects_path.A.get(0));
+			L.B0.setTo(effects_path.B.get(0));
+			R.A0.setTo(effects_path.C.get(0));
+			R.B0.setTo(effects_path.D.get(0));
+			
+		}
 
 		fill(0);
 		textSize(50);
@@ -281,11 +313,20 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			this.noFill();
 			this.stroke(0,0,255);
 			this.strokeWeight(6);
-	//		bary_coords.show(this);
+		//	bary_coords.show(this);
 			mController.show(this);
+			mController.showTriangle(this);
 		}
 		//
 	}// End of draw
+
+	private void compute_bary_coords(MotionPath effects_path2, Pt a2, Pt b2,
+			Pt c2) {
+		for(Pt p: effects_path2.A){
+			
+		}
+		
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -1141,9 +1182,30 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		showCannedWarp=true;
 		
 		//Assign the barycentric coords
-	//	bary_coords = new Barycentric_Coords(new Pt(100,100), new Pt(100, 400),new Pt(300, 400));
+		//compute triangle
+		mController= new MultiTouchController(new Pt(100,50), new Pt(1200, 50),new Pt(1200, 800),menu);
 		
-		mController= new MultiTouchController(new Pt(100,100),new Pt(100,100),new Pt(100,100),menu);
+		//Compute The original Barycentric coords for the loaded effects_path
+		for(Pt p: effects_path.A){
+			weights_a.add(p.barycentric(mController.getDiskAt(0), 
+					mController.getDiskAt(1), mController.getDiskAt(2)));
+		}
+		for(Pt p: effects_path.B){
+			weights_b.add(p.barycentric(mController.getDiskAt(0), 
+					mController.getDiskAt(1), mController.getDiskAt(2)));
+		}
+		
+		for(Pt p: effects_path.C){
+			weights_c.add(p.barycentric(mController.getDiskAt(0), 
+					mController.getDiskAt(1), mController.getDiskAt(2)));
+		}
+		
+		for(Pt p: effects_path.D){
+			weights_d.add(p.barycentric(mController.getDiskAt(0), 
+					mController.getDiskAt(1), mController.getDiskAt(2)));
+		}
+		
+		
 	}
 	
 	

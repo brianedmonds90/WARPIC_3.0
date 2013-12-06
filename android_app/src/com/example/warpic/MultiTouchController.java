@@ -297,14 +297,6 @@ class MultiTouchController {// Used to process the android API touch events for
 		return elapsedTime;
 	}
 
-
-
-	private void liftCanned(MyMotionEvent me) {
-		canned_motion_path.currentTouch= new Pt();
-		canned_motion_path.prevTouch= new Pt();
-		
-	}
-
 	private void motion_canned(MyMotionEvent me) {
 		
 		MultiTouch temp = null;
@@ -357,12 +349,37 @@ class MultiTouchController {// Used to process the android API touch events for
 		} else if (me.action == 0) {// The user has lifted their fingers from
 									// the screen
 			// Register the lift event
-			//lift(me);
-			System.out.println("Filler");
+			lift_canned(me);
 		} else {
 			motion_canned(me);
 		}
 		
+	}
+
+	private void lift_canned(MyMotionEvent me) {
+		MultiTouch temp = null;
+		for (int i = 0; i < mTContainer.size(); i++) {// iterate through the
+														// multiTouch Container
+														// object
+			temp = mTContainer.get(i);
+			if (temp.meIndex == me.pointerId) {
+				temp.liftTime = me.nanoTime / 1000000000.0;
+				temp.selected = false;
+				temp.meIndex = -1;
+			}
+		}
+
+			
+	}
+	
+	public void showTriangle(WarpicActivity wp){
+		wp.noFill();
+		wp.beginShape();
+		getDiskAt(0).v(wp);
+		getDiskAt(1).v(wp);
+		getDiskAt(2).v(wp);
+		getDiskAt(0).v(wp);
+		wp.endShape();
 	}
 
 }

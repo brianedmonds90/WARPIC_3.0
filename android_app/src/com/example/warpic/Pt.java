@@ -35,6 +35,26 @@ class Pt {
     this.y+=dy;
     
   }
+  
+  public Weight barycentric(Pt v1,Pt v2, Pt v3){
+	  float a = v1.x - v3.x; 
+	  float b = v2.x-v3.x; 
+	  float c = v1.y - v3.y; 
+	  float d = v2.y - v3.y; 
+	  float det = a*d - b*c; 
+	  float ia = d/det; 
+	  float ib = -b/det; 
+	  float ic = -c/det; 
+	  float id = a/det;
+	  float rx = this.x - v3.x; 
+	  float ry = this.y - v3.y; 
+	  float l1 = ia*rx+ ib*ry; 
+	  float l2 = ic*rx +id*ry; 
+	  return new Weight(l1,l2,1-l1-l2);
+  }
+  
+  
+  
  public void move(Pt delta){
     this.x+=delta.x;
     this.y+=delta.y;
