@@ -3,7 +3,8 @@ package com.example.warpic;
 import processing.core.PApplet;
 
 class Menu {
-	  Button playAnimation, sendAnimation, showSpirals,showEdges, loadMotionPath, showTexture;
+	  Button playAnimation, sendAnimation, showSpirals,showEdges, 
+	  	loadMotionPath, showTexture, showWarp;
 	  int menuH;
 	  int menuW;
 	  WarpicActivity myPa;
@@ -15,6 +16,7 @@ class Menu {
 		showEdges = new Button("ShowEdges", 500,500,pa);
 		loadMotionPath = new Button("Load Motion", 500,500,pa);
 		showTexture = new Button("Show Texture", 0,0 , pa);
+		showWarp = new Button("Edit Warp", 0, 0, pa);
 		myPa= pa;
 		reArrange();
 	    
@@ -33,6 +35,8 @@ class Menu {
 		  loadMotionPath.y= sendAnimation.y-showEdges.bHeight;
 		  showTexture.y= sendAnimation.y-showEdges.bHeight;
 		  showTexture.x=loadMotionPath.x+loadMotionPath.bWidth;
+		  showWarp.x=showTexture.x+showWarp.bWidth;
+		  showWarp.y=showTexture.y;
 	  }
 	  
 	  void draw(PApplet pa) {
@@ -43,7 +47,7 @@ class Menu {
 		  showEdges.draw(pa);
 		  loadMotionPath.draw(pa);
 		  showTexture.draw(pa);
-		  
+		  showWarp.draw(pa);
 	  }
 	 
 	  void buttonPressed(Pt p) {
@@ -53,6 +57,7 @@ class Menu {
 		  showEdges.pressed(p);
 		  loadMotionPath.pressed(p);
 		  showTexture.pressed(p);
+		  showWarp.pressed(p);
 		
 	  }
 	  
@@ -60,7 +65,7 @@ class Menu {
 		  //set all buttons pressed to false
 		  if(sendAnimation.pressed){
 			 
-			  myPa.getReadyToAnimate_1();
+			 // myPa.getReadyToAnimate_1();
 			  myPa.addAnimationString();
 			  myPa.sendAnimation();
 		  }
@@ -79,6 +84,17 @@ class Menu {
 		  else if(showTexture.pressed){
 			  myPa.showTexture=!myPa.showTexture;
 		  }
+		  else if(showWarp.pressed){
+			  try{
+				  myPa.getReadyToAnimate_1();
+			  }
+			  catch(Exception e){
+				  e.printStackTrace();
+			  }
+			  myPa.getBaryCentricCoords();
+			  myPa.editWarp=!myPa.editWarp;
+			  myPa.showWarp=true;
+		  }
 		  unPressAll();
 		  
 	  }
@@ -90,6 +106,7 @@ class Menu {
 		  showEdges.pressed=false;
 		  loadMotionPath.pressed=false;
 		  showTexture.pressed=false;
+		  showWarp.pressed=false;
 	  }
 
 	  public void motion(MyMotionEvent me) {
