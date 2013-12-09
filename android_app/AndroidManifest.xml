@@ -26,6 +26,11 @@
             android:name="com.example.warpic.Gallery_Activity"
             android:label="Motion Gallery">
             </activity>
+            
+          <activity
+            android:name="com.example.warpic.SaveWarpActivity"
+            android:label="Save Your Warp Path">
+          </activity>
     	<activity
             android:name="com.example.warpic.StartMenuActivity"
             android:label="@string/app_name" 

@@ -10,7 +10,7 @@ public class MotionPath {
 	public Pt displacement;
 	public Pt prevTouch_1;
 	public MotionPath(String n){
-		n=name;
+		name=n;
 		A= new ArrayList<Pt>();
 		B= new ArrayList<Pt>();
 		C= new ArrayList<Pt>();
@@ -855,6 +855,10 @@ D.add(new Pt(899.6875f,67.06104f));
 
 	public void calcDisplacement() {
 		displacement= new Pt(currentTouch.x-prevTouch.x,currentTouch.y-prevTouch.y);		
+	}
+	
+	public String toString(){
+		return name;
 	}
 
 

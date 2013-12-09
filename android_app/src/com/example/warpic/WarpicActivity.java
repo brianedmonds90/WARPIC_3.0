@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import processing.core.PApplet;
 import processing.core.PImage;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.os.Environment;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
+
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -30,21 +32,15 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	int n = 50; // size of grid. Must be >2!
 	Pair initL, initR;
 	Pt[][] G = new Pt[n][n]; // array of vertices
-	boolean showVertices = false, showEdges = false, showTexture = true; // flags
-																			// for
-																			// rendering
-																			// vertices
-																			// and
-	// edges
-	boolean showWarp = false;
-	float w, h, ww, hh; // width, height of cell in absolute and normalized
-						// units
-	MultiTouchController mController;
+	boolean showVertices = false, showEdges = false, showTexture = true; // flags for rendering vertices and edges
+	static boolean showWarp = false;
+	float w, h, ww, hh; // width, height of cell in absolute and normalized units
+	static MultiTouchController mController;
 	ArrayList<MyMotionEvent> l;
 	String imageFilePath;
 	boolean showSpirals, showFingerPaths;
 	PImage myImage;// Image to be warped
-	Menu menu;
+	static Menu menu;
 	static boolean showController, fingersOnScreen, animate, firstPass,
 			saveWarp, showPrimeSpirals;
 	Pair L, R; // Declare warping pairs
@@ -67,12 +63,17 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	ParseObject testObject;
 	ParseFile imageParseFile;
 	StringBuilder motionStrBuilder;
-	double ellapsed_time;
-	MotionPath effects_path;
-	boolean editWarp;
+	static double ellapsed_time;
+	static MotionPath effects_path;
+	static boolean editWarp;
 	public static boolean setL_R_prime;
+	public static boolean warp_selected=true;
 	public Pair currentTouch = new Pair();
-	public ArrayList<Weight> weights_a, weights_b, weights_c, weights_d;
+	public static ArrayList<Weight> weights_a;
+	public static ArrayList<Weight> weights_b;
+	public static ArrayList<Weight> weights_c;
+	public static ArrayList<Weight> weights_d;
+	
 
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
@@ -135,6 +136,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		r_prime = new Pair();
 		L = new Pair();
 		R = new Pair();
+		
 	}
 
 	public void draw() {
@@ -444,10 +446,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 					float py = me.getY(i);
 					loc = new Pt(px, py);
 					l.add(new MyMotionEvent(action, me.getPointerId(i), loc,
-							pointerCount, System.nanoTime())); // queue all the
-																// data recieved
-																// from the
-																// motion events
+							pointerCount, System.nanoTime())); // queue all the data recieved from the motion events
 				}
 			}
 		}
@@ -1107,20 +1106,29 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	public void launchMotionGallery() {
-		// Intent intent = new Intent(this, Gallery_Activity.class);
-		// startActivity(intent);
-		//
+		 Intent intent = new Intent(this, Gallery_Activity.class);
+		 startActivity(intent);
+		
+//		effects_path.initSmile();
+//		// Assign the barycentric coords
+//		getBaryCentricCoords();
+//		editWarp = true;
+//
+//		ellapsed_time = 5;
+//		showWarp = true;
+
+	}
+	
+	public static void load_warp_points(){
 		effects_path.initSmile();
 		// Assign the barycentric coords
 		getBaryCentricCoords();
 		editWarp = true;
-
 		ellapsed_time = 5;
-		showWarp = true;
-
+		showWarp = true; 
 	}
-
-	public void getBaryCentricCoords() {
+	
+	public static void getBaryCentricCoords() {
 		// compute triangle
 		mController = new MultiTouchController(new Pt(100, 50),
 				new Pt(1200, 50), new Pt(1200, 800), menu);
@@ -1144,5 +1152,11 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 					mController.getDiskAt(1), mController.getDiskAt(2)));
 		}
 
+	}
+
+	public void saveWarpPath() {
+	 Intent intent = new Intent(this, SaveWarpActivity.class);
+	 startActivity(intent);
+		
 	}
 }
