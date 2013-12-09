@@ -24,17 +24,17 @@ public class SaveWarpActivity extends Activity{
 	}
 	
 	public void save(View v){
-		//TODO: CREATE A SQLLite DB to store the warped paths
+		
 		String name = ed.getText().toString();
 		warps.put("name", name);
+		String motion_string= WarpicActivity.makePtsString();
+		warps.put("motion",motion_string);
+		warps.put("ellapsed_time", WarpicActivity.ellapsed_time);
 		warps.saveInBackground(new SaveCallback() {
 			Context context = getApplicationContext();
-			//CharSequence text = "Save successful";
 			int duration = Toast.LENGTH_SHORT;
 			public void done(ParseException e) {
 				if (e == null) {
-	
-
 					Toast toast = Toast.makeText(context, "Save Successful", duration);
 					toast.show();
 

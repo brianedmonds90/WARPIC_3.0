@@ -1000,7 +1000,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}
 	}
 
-	public String makePtsString() {
+	public static String makePtsString() {
 		String ret = "";
 		for (Pt p : effects_path.A) {
 			ret += p.x + "," + p.y + "\n";
