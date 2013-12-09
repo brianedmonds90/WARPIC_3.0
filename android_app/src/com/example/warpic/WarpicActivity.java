@@ -81,7 +81,10 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 		Parse.initialize(this, "BgpuXDtTXuLyXOyv5A6sEs6ehKqcaXakOC7Mg13N",
 				"A8pFBNRcLjGrhclpFFvJFNXsMaZyOfZypjiKlPjD");
+		
 		testObject = new ParseObject("TestObject");
+		
+		
 		motionStrBuilder = new StringBuilder();
 		motionString = "";
 		motionFile = new File(Environment.getExternalStorageDirectory(),
