@@ -41,7 +41,8 @@ public class Gallery_Activity extends Activity{
             // argument position gives the index of item which is clicked
         	public void onItemClick(AdapterView<?> arg0, View v,int position, long arg3)
             {
-			    WarpicActivity.load_warp_points();
+        		MotionPath mp=(MotionPath) l.getItemAtPosition(position);
+			    WarpicActivity.load_warp_points(mp);
 			    onBackPressed();	
 			}
 		});
@@ -60,6 +61,7 @@ public class Gallery_Activity extends Activity{
 		         } else {
 		        	 Toast toast = Toast.makeText(context, "Load Unsuccessful", duration);
 					 toast.show();
+					 e.printStackTrace();
 		         }
 		     }
 
@@ -68,6 +70,8 @@ public class Gallery_Activity extends Activity{
 				MotionPath mp;
 				for(ParseObject warp: objects){
 				    mp= new MotionPath(warp.getString("name"));
+				    String paths= warp.getString("motion");
+				    mp.unparsed_string=paths;
 				    m_paths.add(mp);
 				}
 				mp_adapter.addAll(m_paths);
@@ -76,10 +80,5 @@ public class Gallery_Activity extends Activity{
 
 		 });
 		
-	}
-
-	public void select_warp(View v){
-
-	}
-	
+	}	
 }

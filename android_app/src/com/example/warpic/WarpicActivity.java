@@ -256,11 +256,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			this.noFill();
 			this.stroke(0, 0, 255);
 			this.strokeWeight(6);
-			
-			mController.show(this);
-			
+			mController.show(this);			
 			mController.showTriangle(this);
-		
 		}
 	}// End of draw
 
@@ -284,14 +281,11 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		for (Weight w : weights_d) {
 			d2.add(w.to_global_coords(v1, v2, v3));
 		}
-
 		// Set the pairs correctly based on the new coordinates
 		L.A0.setTo(a2.get(0));
 		L.B0.setTo(b2.get(0));
 		R.A0.setTo(c2.get(0));
 		R.B0.setTo(d2.get(0));
-	
-
 	}
 
 	@Override
@@ -303,9 +297,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		Bitmap bMap = null;
 		PImage img = null;
 		try {
-			bMap = BitmapFactory.decodeFile(string); // Get the jpeg image as a
-														// Bitmap from the
-														// filesystem
+			bMap = BitmapFactory.decodeFile(string); // Get the jpeg image as a Bitmap from the filesystem
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1122,13 +1114,67 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 	}
 	
-	public static void load_warp_points(){
-		effects_path.initSmile();
+	public static void load_warp_points(MotionPath mp){
+		//effects_path.initSmile();
+		parse_paths(mp);
+		effects_path.setTo(mp);
 		// Assign the barycentric coords
 		getBaryCentricCoords();
 		editWarp = true;
 		ellapsed_time = 5;
 		showWarp = true; 
+	}
+	
+	private static void parse_paths(MotionPath mp) {
+		seperatePts(split(mp.unparsed_string,"\n"),mp);
+	}
+
+	//Seperates a text file into seperate ArrayLists each one represents a different fingers motions
+	public static void seperatePts(String [] ss,MotionPath mp) {  
+	  int spaces=0;
+	  ArrayList<String> myList=new ArrayList();
+	  for (int i=0;i<ss.length;i++) {
+	    if (ss[i].equals("-")) {
+	      if (spaces==0) {
+	    	  System.out.println("myList: "+myList.get(0));
+	    	  mp.A= addPtsToList(myList);
+	      }  
+	      else if (spaces==1) {
+	    	  mp.B= addPtsToList(myList);
+	      }
+	      else if (spaces==2)
+	    	  mp.C=addPtsToList(myList);
+	      else if (spaces==3)
+	    	  mp.D=addPtsToList(myList);
+	      else {
+	        break;
+	      }
+	      myList.clear();
+	      spaces++;
+	    }
+	   
+	    else {
+	      System.out.println("string ss: "+ss[i]);
+	      myList.add(ss[i]);
+	    }
+	  }
+	}
+
+	//Takes in the finger motion lists and adds them to the user motion paths
+	static ArrayList<Pt> addPtsToList(ArrayList<String> ss) {
+	  ArrayList<Pt> list = new ArrayList<Pt>();
+	  int s=0; 
+	  int comma;   
+	  float x, y; 
+	  Pt n;  
+	  for (int k=0; k<ss.size(); k++) { 
+	    comma=ss.get(k).indexOf(',');   
+	    x= Float.parseFloat(ss.get(k).substring(0, comma)); 
+	    y= Float.parseFloat(ss.get(k).substring(comma+1, ss.get(k).length()));
+	    n= new Pt(x,y);
+	    list.add(n);
+	  }
+	  return list;
 	}
 	
 	public static void getBaryCentricCoords() {
@@ -1137,9 +1183,11 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 				new Pt(1200, 50), new Pt(1200, 800), menu);
 		// Compute The original Barycentric coords for the loaded effects_path
 		for (Pt p : effects_path.A) {
+			System.out.println("point p: "+p);
 			weights_a.add(p.barycentric(mController.getDiskAt(0),
 					mController.getDiskAt(1), mController.getDiskAt(2)));
 		}
+		
 		for (Pt p : effects_path.B) {
 			weights_b.add(p.barycentric(mController.getDiskAt(0),
 					mController.getDiskAt(1), mController.getDiskAt(2)));
@@ -1154,12 +1202,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			weights_d.add(p.barycentric(mController.getDiskAt(0),
 					mController.getDiskAt(1), mController.getDiskAt(2)));
 		}
-
 	}
 
 	public void saveWarpPath() {
-	 Intent intent = new Intent(this, SaveWarpActivity.class);
-	 startActivity(intent);
 		
+		Intent intent = new Intent(this, SaveWarpActivity.class);
+		startActivity(intent);
+	
 	}
 }

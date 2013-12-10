@@ -9,6 +9,7 @@ public class MotionPath {
 	public Pt currentTouch;
 	public Pt displacement;
 	public Pt prevTouch_1;
+	public String unparsed_string;
 	public MotionPath(String n){
 		name=n;
 		A= new ArrayList<Pt>();
@@ -861,5 +862,18 @@ D.add(new Pt(899.6875f,67.06104f));
 		return name;
 	}
 
-
+	public void setTo(MotionPath mp) {
+		for(Pt p: mp.A){
+			A.add(p);
+		}
+		for(Pt p: mp.B){
+			B.add(p);
+		}
+		for(Pt p: mp.C){
+			C.add(p);
+		}
+		for(Pt p: mp.D){
+			D.add(p);
+		}
+	}
 }
