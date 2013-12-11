@@ -11,12 +11,4 @@
         android:layout_height="354dp" >
 	
     </ListView>
-
-    <Button
-        android:id="@+id/select_warp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Warp" 
-        android:onClick="select_warp"/>
-
 </LinearLayout>

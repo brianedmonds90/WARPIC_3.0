@@ -29,7 +29,7 @@ public class Gallery_Activity extends Activity{
 		l= (ListView) findViewById(R.id.motion_gallery_list);
 	
 		motion_paths = new ArrayList<MotionPath>();
-		motion_paths.add(new MotionPath("smile"));
+//		motion_paths.add(new MotionPath("smile"));
 		mp_adapter= new MotionPathAdapter(motion_paths,getApplicationContext());
 		
 		getWarps();

@@ -252,13 +252,13 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			effects_path.showPaths(this);
 		}
 
-		if (editWarp) {
-			this.noFill();
-			this.stroke(0, 0, 255);
-			this.strokeWeight(6);
-			mController.show(this);			
-			mController.showTriangle(this);
-		}
+//		if (editWarp) {
+//			this.noFill();
+//			this.stroke(0, 0, 255);
+//			this.strokeWeight(6);
+//			mController.show(this);			
+//			mController.showTriangle(this);
+//		}
 	}// End of draw
 
 	private void editWarp(ArrayList<Pt> a2, ArrayList<Pt> b2, ArrayList<Pt> c2,
@@ -960,7 +960,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	void launchShareMultiple() {
-
 		Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
 		shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 		shareIntent.setType("image/*");
@@ -1172,7 +1171,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	    x= Float.parseFloat(ss.get(k).substring(0, comma)); 
 	    y= Float.parseFloat(ss.get(k).substring(comma+1, ss.get(k).length()));
 	    n= new Pt(x,y);
-	    list.add(n);
+	    list.add(n); 
 	  }
 	  return list;
 	}
