@@ -139,6 +139,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		r_prime = new Pair();
 		L = new Pair();
 		R = new Pair();
+		System.out.println("Display Width: "+displayWidth);
+		System.out.println("Display Height: "+displayHeight);
 		
 	}
 
@@ -1042,7 +1044,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	public void sendAnimation() {
-		System.out.println("motionString: " + motionString);
+		
 		testObject.put("brain", motionString);
 		motionString = "";
 		imageParseFile = new ParseFile("image_file", parseImageFile());

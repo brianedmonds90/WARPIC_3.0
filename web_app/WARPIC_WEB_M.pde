@@ -22,7 +22,7 @@ boolean saveAnimationURI=false;
 ArrayList<String> uris;
 
 void setup() {
-  size(800, 600,P3D); 
+  size(1280, 800,P3D); 
   displayWidth=width;
   displayHeight=height;
   frameRate(30);

@@ -84,7 +84,6 @@ class Menu {
 		  else if(playAnimation.pressed)
 			 myPa.timeToAnimate();
 		  else if(showSpirals.pressed){
-			  //myPa.launchMotionGallery();
 			  myPa.showSpirals=!myPa.showSpirals;
 		  }
 		  else if(showEdges.pressed){
