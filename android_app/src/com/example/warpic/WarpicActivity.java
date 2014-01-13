@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+//import processing.event.KeyEvent;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -66,15 +66,16 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	static double ellapsed_time;
 	static MotionPath effects_path;
 	static boolean editWarp;
-	public static boolean setL_R_prime;
+	public static boolean regrab;
 	public static boolean warp_selected=true;
 	public Pair currentTouch = new Pair();
 	public static ArrayList<Weight> weights_a;
 	public static ArrayList<Weight> weights_b;
 	public static ArrayList<Weight> weights_c;
 	public static ArrayList<Weight> weights_d;
+	public static boolean regrab_touched;
+	Pt aa, b;
 	
-
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
@@ -83,8 +84,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 				"A8pFBNRcLjGrhclpFFvJFNXsMaZyOfZypjiKlPjD");
 		
 		testObject = new ParseObject("TestObject");
-		
-		
 		motionStrBuilder = new StringBuilder();
 		motionString = "";
 		motionFile = new File(Environment.getExternalStorageDirectory(),
@@ -133,15 +132,15 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		effects_path = new MotionPath("smile");
 		// smile.initSmile();
 		mController = new MultiTouchController(menu, effects_path);
-		setL_R_prime = false;
+		regrab = false;
 		showPrimeSpirals = false;
-		l_prime = new Pair();
-		r_prime = new Pair();
 		L = new Pair();
 		R = new Pair();
-		System.out.println("Display Width: "+displayWidth);
-		System.out.println("Display Height: "+displayHeight);
 		
+		l_prime= new Pair();
+		r_prime= new Pair();
+		aa= new Pt();
+		regrab_touched= false;
 	}
 
 	public void draw() {
@@ -173,8 +172,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		if (editWarp) {
 			Pt v1 = mController.getDiskAt(0);
 			Pt v2 = mController.getDiskAt(1);
-			Pt v3 = mController.getDiskAt(2);
-			
+			Pt v3 = mController.getDiskAt(2);			
 			editWarp(effects_path.A, effects_path.B, effects_path.C,
 					effects_path.D, v1, v2, v3);
 		}
@@ -253,14 +251,24 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			this.stroke(0, 255, 0);
 			effects_path.showPaths(this);
 		}
-
-//		if (editWarp) {
-//			this.noFill();
-//			this.stroke(0, 0, 255);
-//			this.strokeWeight(6);
-//			mController.show(this);			
-//			mController.showTriangle(this);
-//		}
+		
+		//The user has just lifted fingers indicating that they may regrab
+		if(regrab){
+			textSize(32);
+			text("Regrab",100,100);	
+		}
+		
+		//The user has placed their fingers on the screen, regrabbing
+		if(regrab_touched){
+			textSize(32);
+			text("Regrab_touched",100,150);
+			l_prime.A0=mController.getMultiTouchAt(0).currentTouch;
+			l_prime.B0=mController.getMultiTouchAt(1).currentTouch;
+//			aa=mController.getMultiTouchAt(0).currentTouch;
+//			aa.show(aa, 25, this);
+			stroke(0);
+			l_prime.show0(this);
+		}
 	}// End of draw
 
 	private void editWarp(ArrayList<Pt> a2, ArrayList<Pt> b2, ArrayList<Pt> c2,

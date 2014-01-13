@@ -24,7 +24,6 @@ class Pair {
 	 // edge(A0,B0);
 	  pa.line(A0.x,A0.y,B0.x,B0.y);
 	  A0.show(A0,2,pa);
-  
   }
   
   void showt(PApplet pa) {

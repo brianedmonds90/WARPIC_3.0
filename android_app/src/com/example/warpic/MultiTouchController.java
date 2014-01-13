@@ -63,14 +63,18 @@ class MultiTouchController {// Used to process the android API touch events for
 		mTContainer.add(new MultiTouch(600, 400));
 	}
 
-	public void touch(MyMotionEvent ev) {// Method used when a touch event
-										// happens
+	public void touch(MyMotionEvent ev) {// Method used when a touch event happens
 		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
 		MultiTouch finger;
 		if (recordTime) {
 			initTime = ev.nanoTime / 1000000000.0;
 			recordTime = false;
 		}
+		
+		if(WarpicActivity.regrab){
+			WarpicActivity.regrab_touched=true;
+		}
+		
 		if (mTContainer.size() < 4) {// Adjust this number to adjust the number
 										// of fingers that you want to use
 			finger = new MultiTouch(cTouch.x, cTouch.y);
@@ -96,7 +100,6 @@ class MultiTouchController {// Used to process the android API touch events for
 											// movement
 			}
 		}
-
 	}
 
 	public void lift(MyMotionEvent me) {// Used when a finger is lifted
@@ -125,7 +128,7 @@ class MultiTouchController {// Used to process the android API touch events for
 				WarpicActivity.grabPoints = true;
 			}
 			else if(!WarpicActivity.firstPass){
-				WarpicActivity.setL_R_prime=true;
+				WarpicActivity.regrab=true;
 			}
 			WarpicActivity.fingersOnScreen = false;
 		}
