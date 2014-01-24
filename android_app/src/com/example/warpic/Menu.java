@@ -4,7 +4,7 @@ import processing.core.PApplet;
 
 class Menu {
 	  Button playAnimation, sendAnimation, showSpirals,showEdges, 
-	  	loadMotionPath, showTexture, editWarp, saveWarpPath, showWarp;
+	  	loadMotionPath, showTexture, editWarp, saveWarpPath, showWarp,showHistory;
 	  int menuH;
 	  int menuW;
 	  WarpicActivity myPa;
@@ -19,6 +19,7 @@ class Menu {
 		editWarp = new Button("Edit Warp", 0, 0, pa);
 		saveWarpPath = new Button("Save Warp", 0,0,pa);
 		showWarp = new Button("Show Warp",0,0,pa);
+		showHistory= new Button("Show History", 0, 0, pa);
 		myPa= pa;
 		reArrange();
 	    
@@ -43,6 +44,8 @@ class Menu {
 		  saveWarpPath.y=playAnimation.y;
 		  showWarp.x=saveWarpPath.x+showWarp.bWidth;
 		  showWarp.y=saveWarpPath.y;
+		  showHistory.x=showWarp.x;
+		  showHistory.y=showWarp.y-showHistory.bHeight;
 	  }
 	  
 	  void draw(PApplet pa) {
@@ -56,6 +59,7 @@ class Menu {
 		  editWarp.draw(pa);
 		  saveWarpPath.draw(pa);
 		  showWarp.draw(pa);
+		  showHistory.draw(pa);
 	  }
 	 
 	  void buttonPressed(Pt p) {
@@ -68,16 +72,12 @@ class Menu {
 		  editWarp.pressed(p);
 		  saveWarpPath.pressed(p);
 		  showWarp.pressed(p);
-		
+		  showHistory.pressed(p);
 	  }
 	  
 	  void buttonLifted(){
 		  //set all buttons pressed to false
 		  if(sendAnimation.pressed){
-			 
-			  //myPa.getReadyToAnimate_1();
-			 
-			  
 			  myPa.addAnimationString();
 			  myPa.sendAnimation();
 		  }
@@ -112,6 +112,9 @@ class Menu {
 		  else if(showWarp.pressed){
 			  myPa.showWarp=!myPa.showWarp;
 		  }
+		  else if(showHistory.pressed){
+			  myPa.draw_finger_paths=!myPa.draw_finger_paths;
+		  }
 		  unPressAll();
 	  }
 	  
@@ -125,6 +128,7 @@ class Menu {
 		  editWarp.pressed=false;
 		  saveWarpPath.pressed=false;
 		  showWarp.pressed=false;
+		  showHistory.pressed=false;
 	  }
 
 	  public void motion(MyMotionEvent me) {

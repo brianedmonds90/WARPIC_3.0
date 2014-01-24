@@ -65,8 +65,10 @@ class MultiTouch{//Class holds 3 different points to keep track of the users mov
 	}
 
 	void drawHistory(PApplet pa){
+		
 		for(Pt p: history){
 			p.draw(pa); 
+			
 		}
 	}
 	

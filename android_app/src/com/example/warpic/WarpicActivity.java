@@ -75,7 +75,10 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	public static ArrayList<Weight> weights_d;
 	public static boolean regrab_touched;
 	Pt aa, b;
-	
+	public boolean draw_finger_paths;
+	Pair pp;
+	private boolean regrab_show_lifted;
+	static public boolean regrab_save;
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
@@ -112,6 +115,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		tracking = 0;
 		counter = 0;
 		showSpirals = false;
+		
 		ww = (float) (1.0 / (n - 1));
 		hh = (float) (1.0 / (n - 1)); // set intial width and height of a cell
 		w = displayWidth * ww;
@@ -141,6 +145,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		r_prime= new Pair();
 		aa= new Pt();
 		regrab_touched= false;
+		draw_finger_paths=false;
+		pp= new Pair();
 	}
 
 	public void draw() {
@@ -175,6 +181,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			Pt v3 = mController.getDiskAt(2);			
 			editWarp(effects_path.A, effects_path.B, effects_path.C,
 					effects_path.D, v1, v2, v3);
+			mController.showTriangle(this);
 		}
 
 		if (fingersOnScreen)
@@ -252,24 +259,49 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			effects_path.showPaths(this);
 		}
 		
-		//The user has just lifted fingers indicating that they may regrab
-		if(regrab){
-			textSize(32);
-			text("Regrab",100,100);	
+		if(regrab_save){
+			text("REGRAB",100,100);
+			pp.A0.x=L.A1.x;
+			pp.A0.y=L.A1.y;
+			pp.B0.x=L.B1.x;
+			pp.B0.y=L.B1.y;
+			regrab_save=false;
+			regrab_show_lifted=true;
 		}
 		
+		if(regrab_show_lifted){
+			stroke(100,100,100);
+			pp.show0(this);
+		}
 		//The user has placed their fingers on the screen, regrabbing
 		if(regrab_touched){
-			textSize(32);
-			text("Regrab_touched",100,150);
 			l_prime.A0=mController.getMultiTouchAt(0).currentTouch;
 			l_prime.B0=mController.getMultiTouchAt(1).currentTouch;
-//			aa=mController.getMultiTouchAt(0).currentTouch;
-//			aa.show(aa, 25, this);
 			stroke(0);
 			l_prime.show0(this);
 		}
+		
+		if(draw_finger_paths){
+		//		mController.showHistory(this);
+			showFingerHistory(mController);
+		}
+		
 	}// End of draw
+
+	private void showFingerHistory(MultiTouchController mController2) {
+		ArrayList<Pt> temp;//= mController2.getHistoryOf(0);
+		for(int i=0;i<4;i++){
+		temp= mController2.getHistoryOf(i);	
+			noFill();
+			stroke(0,255,0);
+			strokeWeight(8);
+			beginShape();
+			for(Pt p: temp){
+				vertex(p.x,p.y);
+			}
+			endShape();	
+		}
+	}
 
 	private void editWarp(ArrayList<Pt> a2, ArrayList<Pt> b2, ArrayList<Pt> c2,
 			ArrayList<Pt> d2, Pt v1, Pt v2, Pt v3) {
