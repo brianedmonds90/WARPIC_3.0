@@ -54,7 +54,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	String displayInfo;
 	boolean firstAnimation = true;
 	boolean showMenu;
-	private boolean createNewController;
+	public static boolean createNewController;
 	private boolean firstFrame;
 	private double firstFrameT;
 	static Button myButton;
@@ -66,6 +66,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	static double ellapsed_time;
 	static MotionPath effects_path;
 	static boolean editWarp;
+	public static boolean compute_bary;
 	public static boolean regrab;
 	public static boolean warp_selected=true;
 	public Pair currentTouch = new Pair();
@@ -147,6 +148,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		regrab_touched= false;
 		draw_finger_paths=false;
 		pp= new Pair();
+		compute_bary=false;
 	}
 
 	public void draw() {
@@ -174,19 +176,27 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			createNewController = false;
 		}
 
-		// The user has moved the warp, we need to readjust it
-		if (editWarp) {
-			Pt v1 = mController.getDiskAt(0);
-			Pt v2 = mController.getDiskAt(1);
-			Pt v3 = mController.getDiskAt(2);			
-			editWarp(effects_path.A, effects_path.B, effects_path.C,
-					effects_path.D, v1, v2, v3);
-			mController.showTriangle(this);
+		if (fingersOnScreen){
+			mController.updateHistory();// Record the position once per frame
+			if(editWarp){
+				System.out.println("INSIDE EDIT WARP");
+				Pt v1 = mController.getDiskAt(0);
+				Pt v2 = mController.getDiskAt(1);
+				Pt v3 = mController.getDiskAt(2);
+				mController.showTriangle(this);
+			}
 		}
 
-		if (fingersOnScreen)
-			mController.updateHistory();// Record the position once per frame
-
+		// The user has moved the warp, we need to readjust it
+//		if (editWarp) {
+//			Pt v1 = mController.getDiskAt(0);
+//			Pt v2 = mController.getDiskAt(1);
+//			Pt v3 = mController.getDiskAt(2);			
+//			editWarp(effects_path.A, effects_path.B, effects_path.C,
+//					effects_path.D, v1, v2, v3);
+//			mController.showTriangle(this);
+//		}
+		
 		if (grabPoints) {
 			L.writePairsToFile(motionFile);
 			R.writePairsToFile(motionFile);
@@ -285,6 +295,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		//		mController.showHistory(this);
 			showFingerHistory(mController);
 		}
+		textSize(32);
+		stroke(0);
+		fill(0);
+		text("value of editWarp: "+editWarp,100,100);
+		text("Value of fingersOnScreen: "+fingersOnScreen,100,150);
+		
 		
 	}// End of draw
 
@@ -1160,7 +1176,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		parse_paths(mp);
 		effects_path.setTo(mp);
 		// Assign the barycentric coords
-		getBaryCentricCoords();
+		//getBaryCentricCoords();
+		mController = new MultiTouchController(menu);
 		editWarp = true;
 		ellapsed_time = 5;
 		showWarp = true; 
@@ -1220,8 +1237,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	
 	public static void getBaryCentricCoords() {
 		// compute triangle
-		mController = new MultiTouchController(new Pt(100, 50),
-				new Pt(1200, 50), new Pt(1200, 800), menu);
+	
 		// Compute The original Barycentric coords for the loaded effects_path
 		for (Pt p : effects_path.A) {
 			System.out.println("point p: "+p);

@@ -318,6 +318,7 @@ class MultiTouchController {// Used to process the android API touch events for
 	private void touch_canned(MyMotionEvent ev){
 		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
 		MultiTouch finger;
+		System.out.println("mTContainer size(): "+mTContainer.size());
 		if (mTContainer.size() < 3) {// Adjust this number to adjust the number
 										// of fingers that you want to use
 			finger = new MultiTouch(cTouch.x, cTouch.y);
@@ -327,10 +328,14 @@ class MultiTouchController {// Used to process the android API touch events for
 			finger.downTime = ev.nanoTime / 1000000000.0;
 			mTContainer.add(finger);
 		} 
-		else {// We have four points on the screen, the user wants to move one
+
+		else {// We have 3 points on the screen, the user wants to move one
 				// of them
 			MultiTouch temp = findClosest(cTouch);
-			WarpicActivity.fingersOnScreen = true;
+		//	WarpicActivity.fingersOnScreen = true;			
+//			if(WarpicActivity.compute_bary==false){
+//				WarpicActivity.compute_bary=true;
+//			}
 			if (temp != null) {
 				temp.selected = true;
 				temp.meIndex = ev.pointerId;
@@ -339,6 +344,8 @@ class MultiTouchController {// Used to process the android API touch events for
 											// movement
 			}
 		}
+		if(mTContainer.size()==3)
+			WarpicActivity.fingersOnScreen=true;
 	}
 
 	public void handle_triangle(MyMotionEvent me) {
@@ -366,6 +373,10 @@ class MultiTouchController {// Used to process the android API touch events for
 				temp.selected = false;
 				temp.meIndex = -1;
 			}
+		}
+		if (me.pointerCount == 1) {
+			WarpicActivity.createNewController=true;
+			WarpicActivity.fingersOnScreen=false;
 		}
 
 			
