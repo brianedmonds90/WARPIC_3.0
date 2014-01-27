@@ -176,13 +176,20 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			createNewController = false;
 		}
 
+		if(compute_bary){
+			clearBarys();
+			getBaryCentricCoords();
+			compute_bary=false;
+		}
+		
 		if (fingersOnScreen){
 			mController.updateHistory();// Record the position once per frame
 			if(editWarp){
-				System.out.println("INSIDE EDIT WARP");
 				Pt v1 = mController.getDiskAt(0);
 				Pt v2 = mController.getDiskAt(1);
 				Pt v3 = mController.getDiskAt(2);
+				editWarp(effects_path.A, effects_path.B, effects_path.C,
+				effects_path.D, v1, v2, v3);
 				mController.showTriangle(this);
 			}
 		}
@@ -295,14 +302,15 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		//		mController.showHistory(this);
 			showFingerHistory(mController);
 		}
-		textSize(32);
-		stroke(0);
-		fill(0);
-		text("value of editWarp: "+editWarp,100,100);
-		text("Value of fingersOnScreen: "+fingersOnScreen,100,150);
-		
 		
 	}// End of draw
+
+	private void clearBarys() {
+		weights_a.clear();
+		weights_b.clear();
+		weights_c.clear();
+		weights_d.clear();
+	}
 
 	private void showFingerHistory(MultiTouchController mController2) {
 		ArrayList<Pt> temp;//= mController2.getHistoryOf(0);

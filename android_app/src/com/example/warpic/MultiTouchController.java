@@ -333,9 +333,7 @@ class MultiTouchController {// Used to process the android API touch events for
 				// of them
 			MultiTouch temp = findClosest(cTouch);
 		//	WarpicActivity.fingersOnScreen = true;			
-//			if(WarpicActivity.compute_bary==false){
-//				WarpicActivity.compute_bary=true;
-//			}
+
 			if (temp != null) {
 				temp.selected = true;
 				temp.meIndex = ev.pointerId;
@@ -344,8 +342,10 @@ class MultiTouchController {// Used to process the android API touch events for
 											// movement
 			}
 		}
-		if(mTContainer.size()==3)
+		if(mTContainer.size()==3){
 			WarpicActivity.fingersOnScreen=true;
+			WarpicActivity.compute_bary=true;
+		}
 	}
 
 	public void handle_triangle(MyMotionEvent me) {
