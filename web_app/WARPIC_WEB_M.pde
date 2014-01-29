@@ -93,6 +93,8 @@ void draw() {
   if(showTexture) paintImage(myImage); 
 
 //image(myImage,0,0);
+  //text("L.A0: "+L.A0, 100,100);
+
 	
 }//end of draw loop
 
@@ -106,6 +108,7 @@ void keyPressed() {
   if (key=='l') loadPts(); 
   if (key=='a') animate=!animate;
   if(key=='s') saveFrame();
+  if(key=='d')console.log(L);
 }
 
 void realTimeWarp() {
@@ -208,7 +211,7 @@ void fun(PImage img){
 
 void loadMyImage(String url){
 	loadImage(url,"",fun);
-	showTexture=true;
+//	showTexture=true;
 
 }
 
@@ -217,9 +220,9 @@ void ptsSetup(){
     if (imageSelected) {
       myResize(myImage);
       initGrid(myImage);
-    showEdges=false;
-      showTexture=true;
-    }  
+      showEdges=false;  
+    }
+     
 }
 
 void generate_uri(){
@@ -761,8 +764,10 @@ pt spirals(pt LA0, pt LB0, pt LA1, pt LB1, pt RA0, pt RB0, pt RA1, pt RB1, float
 
 pt scaleForDesktop(pt r) {
   float x, y;
-  x=(r.x*800.0)/1280.0;
-  y=(r.y*600.0)/960.0;
+ // x=(r.x*800.0)/1280.0;
+ // y=(r.y*600.0)/960.0;
+  x=r.x;
+  y=r.y;
   return new pt(x, y);
 }
 
