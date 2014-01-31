@@ -10,6 +10,7 @@ public class MotionPath {
 	public Pt displacement;
 	public Pt prevTouch_1;
 	public String unparsed_string;
+	public Pt upperLeftCorner, bottomLeftCorner, bottomRightCorner,upperRightCorner;
 	public MotionPath(String n){
 		name=n;
 		A= new ArrayList<Pt>();
@@ -19,6 +20,10 @@ public class MotionPath {
 		prevTouch=new Pt(0,0);
 		currentTouch= new Pt(0,0);
 		displacement= new Pt(0,0);
+		upperLeftCorner= new Pt();
+		upperRightCorner = new Pt();
+		bottomLeftCorner = new Pt();
+		bottomRightCorner = new Pt();
 		
 	}
 	
@@ -50,6 +55,111 @@ public class MotionPath {
 		      list.get(v).v(wp);
 		    }
 		    wp.endShape();
+	}
+	
+	public float computeLeftMostBound(){
+		float leftMost=9999999f;
+		for(Pt p: A){
+			if(p.x<leftMost)
+				leftMost=p.x;
+		}
+		for(Pt p: B){
+			if(p.x<leftMost)
+				leftMost=p.x;
+		}
+		for(Pt p: C){
+			if(p.x<leftMost)
+				leftMost=p.x;
+		}
+		for(Pt p: D){
+			if(p.x<leftMost)
+				leftMost=p.x;
+		}
+		return leftMost;
+	}
+	
+	public float computeRightMostBound(){
+		float rightMost=-9999999f;
+		for(Pt p: A){
+			if(p.x>rightMost)
+				rightMost=p.x;
+		}
+		for(Pt p: B){
+			if(p.x>rightMost)
+				rightMost=p.x;
+		}
+		for(Pt p: C){
+			if(p.x>rightMost)
+				rightMost=p.x;
+		}
+		for(Pt p: D){
+			if(p.x>rightMost)
+				rightMost=p.x;
+		}
+		return rightMost;
+	}
+	
+	public float computeUpperMostBound(){
+		float upperMost=-9999999f;
+		for(Pt p: A){
+			if(p.y>upperMost)
+				upperMost=p.y;
+		}
+		for(Pt p: B){
+			if(p.y>upperMost)
+				upperMost=p.y;
+		}
+		for(Pt p: C){
+			if(p.y>upperMost)
+				upperMost=p.y;
+		}
+		for(Pt p: D){
+			if(p.y>upperMost)
+				upperMost=p.y;
+		}
+		return upperMost;
+	}
+	
+	public float computeLowerMostBound(){
+		float lowerMost=9999999f;
+		for(Pt p: A){
+			if(p.y<lowerMost)
+				lowerMost=p.y;
+		}
+		for(Pt p: B){
+			if(p.y<lowerMost)
+				lowerMost=p.y;
+		}
+		for(Pt p: C){
+			if(p.y<lowerMost)
+				lowerMost=p.y;
+		}
+		for(Pt p: D){
+			if(p.y<lowerMost)
+				lowerMost=p.y;
+		}
+		return lowerMost;
+	}
+	
+	public void drawBoundingBox(WarpicActivity wp){
+		wp.fill(255,0,0);
+		wp.stroke(255,0,0);
+		bottomLeftCorner.show(bottomLeftCorner, 10, wp);
+		wp.noFill();
+		wp.beginShape();
+		wp.vertex(upperLeftCorner.x,upperLeftCorner.y);
+		wp.vertex(upperRightCorner.x,upperRightCorner.y);
+		wp.vertex(bottomRightCorner.x,bottomRightCorner.y);
+		wp.vertex(bottomLeftCorner.x,bottomLeftCorner.y);
+		wp.vertex(upperLeftCorner.x,upperLeftCorner.y);
+		wp.endShape();
+	}
+	
+	public void getBoundingBoxCoords(){
+		upperLeftCorner=new Pt(computeLeftMostBound(),computeUpperMostBound());
+		upperRightCorner= new Pt(computeRightMostBound(),computeUpperMostBound());
+		bottomRightCorner = new Pt(computeRightMostBound(),computeLowerMostBound());
+		bottomLeftCorner = new Pt(computeLeftMostBound(),computeLowerMostBound());
 	}
 	
 	public void initSmile(){

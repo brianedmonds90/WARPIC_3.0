@@ -74,6 +74,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	public static ArrayList<Weight> weights_b;
 	public static ArrayList<Weight> weights_c;
 	public static ArrayList<Weight> weights_d;
+	public static ArrayList<Weight> weights_bounding_box;
 	public static boolean regrab_touched;
 	Pt aa, b;
 	public boolean draw_finger_paths;
@@ -110,6 +111,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		weights_b = new ArrayList<Weight>();
 		weights_c = new ArrayList<Weight>();
 		weights_d = new ArrayList<Weight>();
+		weights_bounding_box = new ArrayList<Weight>();
 		// *****************
 
 		showMenu = false;
@@ -178,16 +180,24 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 		if(compute_bary){
 			clearBarys();
+			
 			getBaryCentricCoords();
 			compute_bary=false;
+		}
+		
+		if(editWarp){
+			
+			effects_path.drawBoundingBox(this);
 		}
 		
 		if (fingersOnScreen){
 			mController.updateHistory();// Record the position once per frame
 			if(editWarp){
+				//TODO: the user must apply displacement for the canned warp to take effect
 				Pt v1 = mController.getDiskAt(0);
 				Pt v2 = mController.getDiskAt(1);
 				Pt v3 = mController.getDiskAt(2);
+				displaceBoundingBox(effects_path, v1, v2, v3);
 				editWarp(effects_path.A, effects_path.B, effects_path.C,
 				effects_path.D, v1, v2, v3);
 				mController.showTriangle(this);
@@ -310,6 +320,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		weights_b.clear();
 		weights_c.clear();
 		weights_d.clear();
+		weights_bounding_box.clear();
 	}
 
 	private void showFingerHistory(MultiTouchController mController2) {
@@ -326,7 +337,18 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			endShape();	
 		}
 	}
-
+	
+	private void displaceBoundingBox(MotionPath mp, Pt v1, Pt v2, Pt v3){
+		Weight w= weights_bounding_box.get(0);
+		effects_path.upperLeftCorner=w.to_global_coords(v1, v2, v3);
+		w=weights_bounding_box.get(1);
+		effects_path.upperRightCorner=w.to_global_coords(v1, v2, v3);
+		w=weights_bounding_box.get(2);
+		effects_path.bottomRightCorner=w.to_global_coords(v1, v2, v3);
+		w=weights_bounding_box.get(3);
+		effects_path.bottomLeftCorner=w.to_global_coords(v1, v2, v3);
+	}
+	
 	private void editWarp(ArrayList<Pt> a2, ArrayList<Pt> b2, ArrayList<Pt> c2,
 			ArrayList<Pt> d2, Pt v1, Pt v2, Pt v3) {
 		// Clear the current loactions of the warp motion paths
@@ -334,6 +356,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		b2.clear();
 		c2.clear();
 		d2.clear();
+		
+		//TODO: Add barycentric translation of bounding box here
+		
 		// Recalculate their location based on the barycentric coordinates
 		for (Weight w : weights_a) {
 			a2.add(w.to_global_coords(v1, v2, v3));
@@ -1180,9 +1205,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 	
 	public static void load_warp_points(MotionPath mp){
-		//effects_path.initSmile();
 		parse_paths(mp);
 		effects_path.setTo(mp);
+		effects_path.getBoundingBoxCoords();
 		// Assign the barycentric coords
 		//getBaryCentricCoords();
 		mController = new MultiTouchController(menu);
@@ -1267,6 +1292,18 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			weights_d.add(p.barycentric(mController.getDiskAt(0),
 					mController.getDiskAt(1), mController.getDiskAt(2)));
 		}
+		getBaryCentricCoordsOfBox();
+	}
+
+	private static void getBaryCentricCoordsOfBox() {
+		weights_bounding_box.add(effects_path.upperLeftCorner.barycentric(mController.getDiskAt(0),
+				mController.getDiskAt(1), mController.getDiskAt(2)));
+		weights_bounding_box.add(effects_path.upperRightCorner.barycentric(mController.getDiskAt(0),
+			mController.getDiskAt(1), mController.getDiskAt(2)));
+		weights_bounding_box.add(effects_path.bottomRightCorner.barycentric(mController.getDiskAt(0),
+			mController.getDiskAt(1), mController.getDiskAt(2)));
+		weights_bounding_box.add(effects_path.bottomLeftCorner.barycentric(mController.getDiskAt(0),
+			mController.getDiskAt(1), mController.getDiskAt(2)));	
 	}
 
 	public void saveWarpPath() {
