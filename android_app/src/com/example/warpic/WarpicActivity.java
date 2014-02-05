@@ -81,6 +81,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	Pair pp;
 	private boolean regrab_show_lifted;
 	static public boolean regrab_save;
+	public static MotionPath reset_to_motion_path;
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
@@ -151,6 +152,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		draw_finger_paths=false;
 		pp= new Pair();
 		compute_bary=false;
+		reset_to_motion_path= new MotionPath("RESET");
+		
 	}
 
 	public void draw() {
@@ -1213,7 +1216,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		mController = new MultiTouchController(menu);
 		editWarp = true;
 		ellapsed_time = 5;
-		showWarp = true; 
+		reset_to_motion_path=mp;
+		//showWarp = true; 
 	}
 	
 	private static void parse_paths(MotionPath mp) {
