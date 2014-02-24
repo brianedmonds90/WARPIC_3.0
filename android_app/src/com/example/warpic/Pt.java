@@ -114,7 +114,7 @@ class Pt {
 //      };  
   void addPt(Pt P) {x+=P.x; y+=P.y; z+=P.z;};
   void subPt(Pt P) {x-=P.x; y-=P.y; z-=P.z; };
-  void mul(float f) {x*=f; y*=f; y*=f;};
+  void mul(float f) {x*=f; y*=f; };
   void pers(float d) { y=d*y/(d+z); x=d*x/(d+z); z=d*z/(d+z); };
   void inverserPers(float d) { y=d*y/(d-z); x=d*x/(d-z); z=d*z/(d-z); };
 //  boolean coplanar (Pt A, Pt B, Pt C) {return(abs(tetVol(this,A,B,C))<0.0001);};
@@ -128,7 +128,7 @@ class Pt {
   Pt lerp(Pt A, float s, Pt B) {return make(A.x+s*(B.x-A.x),A.y+s*(B.y-A.y));};//,A.z+s*(B.z-A.z)); };                 // A+sAB
   // display 
   void show(Pt P, float r, PApplet pa) {pa.ellipse(P.x, P.y, 2*r, 2*r);};                                             // draws circle of center r around P
-  void show(Pt P,PApplet pa) {pa.ellipse(P.x, P.y, 6,6);};                                                           // draws small circle around point
+  public void show(Pt P,PApplet pa) {pa.ellipse(P.x, P.y, 6,6);};                                                           // draws small circle around point
   void edge(Pt P, Pt Q,PApplet pa) {pa.line(P.x,P.y,Q.x,Q.y); };                                                      // draws edge (P,Q)
 //  Vec triNormalFromPts(Pt A, Pt B, Pt C) {Vec N = cross(A.VecTo(B),A.VecTo(C));  return(N); };
 //  float tetVol (Pt A, Pt B, Pt C, Pt D) { return(dot(triNormalFromPts(A,B,C),A.VecTo(D))); };

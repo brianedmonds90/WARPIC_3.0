@@ -109,6 +109,7 @@ void keyPressed() {
   if (key=='a') animate=!animate;
   if(key=='s') saveFrame();
   if(key=='d')console.log(L);
+  if(key== 'f') showSpirals= !showSpirals;
 }
 
 void realTimeWarp() {

@@ -20,6 +20,7 @@ class MultiTouchController {// Used to process the android API touch events for
 	MotionPath canned_motion_path;
 	double initTime, liftTime, elapsedTime;
 	boolean recordTime;
+	private WarpicActivity warpicActivity;
 	MultiTouchController(int num) {
 		mTContainer = new ArrayList<MultiTouch>(num);
 		for (int i = 0; i < num; i++) {
@@ -54,6 +55,12 @@ class MultiTouchController {// Used to process the android API touch events for
 		mTContainer.add(new MultiTouch(a.x,a.y));
 		mTContainer.add(new MultiTouch(b.x,b.y));
 		mTContainer.add(new MultiTouch(c.x, c.y));
+	}
+
+	public MultiTouchController(Menu menu2, MotionPath effects_path,
+			WarpicActivity wActivity) {
+		this(menu2,effects_path);
+		warpicActivity = wActivity;
 	}
 
 	public void init() {// Puts disk objects on the screen to be moved around
@@ -230,7 +237,29 @@ class MultiTouchController {// Used to process the android API touch events for
 			m.history.add(new Pt(m.disk.x, m.disk.y));
 		}
 	}
+	
+	void updateHistory(Pt ctr, float bigR, float littleR) {
+		Pt p;
+		for (MultiTouch m : mTContainer) {
+			p= new Pt(m.disk.x, m.disk.y);
+			p = p.subtract(ctr);
+			p.mul(bigR/littleR);
+			m.history.add(p);
+		}
+	}
 
+	private void proxy_point(ArrayList<Pt> _d, float R, float r, Pt ctr) {
+		
+		Pt temp;
+		for(Pt p: _d){
+			
+			temp = p.subtract(ctr);
+			temp.mul(r/R);
+			p = ctr.add(temp);
+		}
+		
+	}
+	
 	void showEdges(PApplet p) {// Shows the lines inbetween the fingers
 		Pt a, b, c, d;
 		p.strokeWeight(10);

@@ -1,6 +1,9 @@
 package com.example.warpic;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+
+import android.util.Log;
 
 import processing.core.PApplet;
 class Pair {  
@@ -53,8 +56,8 @@ class Pair {
   }
   
   Pair evaluate(float t,WarpicActivity helper) { 
-    a =helper.spiralAngle(A0,B0,A1,B1); 
-    s =helper.spiralScale(A0,B0,A1,B1);
+    a = helper.spiralAngle(A0,B0,A1,B1); 
+    s = helper.spiralScale(A0,B0,A1,B1);
     G = helper.spiralCenter(a, s, A0, A1); 
     At = helper.L(G,helper.R(A0,t*a,G),helper.pow(s,t));
     Bt = helper.L(G,helper.R(B0,t*a,G),helper.pow(s,t));
@@ -129,6 +132,28 @@ class Pair {
 	}
 	public String toString(){
 		String ret= "A0: "+A0+"\nB0: "+B0+"\nA1: "+A1+"\nB1: "+B1;
+		return ret;
+	}
+
+	public void proxy(float bigR, float littleR, Pt ctr_of_roi,WarpicActivity helper) {
+		A0 = helper.perform_proxy_calculations(A0,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
+		B0 = helper.perform_proxy_calculations(B0,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
+		A1 = helper.perform_proxy_calculations(A1,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
+		B1 = helper.perform_proxy_calculations(B1,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
+	}
+
+	//Used for updating the pairs along a motionpath
+	public Pair setPair(ArrayList<Pt> historyOf, ArrayList<Pt> historyOf2,
+			int index) {
+		Pair ret = null;
+		try{
+		ret = new Pair(historyOf.get(0), historyOf2.get(0),historyOf.get(index),historyOf2.get(index));
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			
+			return this;
+		}
 		return ret;
 	}
  } // end pair
