@@ -333,24 +333,6 @@ class MultiTouchController {// Used to process the android API touch events for
 		return elapsedTime;
 	}
 
-	private void motion_canned(MyMotionEvent me) {
-		
-		MultiTouch temp = null;
-		// find the matching index within the mTContainer object
-		int j = me.pointerId; // which finger are we looking at
-		int index = indexOf(j); // what is the index of the pointer data within
-								// the mTContainer list
-		if (index != -1 && mTContainer.get(index).selected) {
-			temp = mTContainer.get(index);
-			// log the current position of the users fingers
-			temp.currentTouch = new Pt(me.loc.x, me.loc.y, 0);
-			// calculate the distance moved from the previous frame and move the
-			// point
-			temp.disk.move(temp.currentTouch.subtract(temp.lastTouch));
-			temp.lastTouch.set(temp.currentTouch);
-		}
-	}
-
 	private void touch_canned(MyMotionEvent ev){
 		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
 		MultiTouch finger;
@@ -451,7 +433,6 @@ class MultiTouchController {// Used to process the android API touch events for
 			// log the current position of the users fingers
 			temp.currentTouch = new Pt(me.loc.x, me.loc.y);
 			// calculate the distance moved from the previous frame and move the point
-			float displacement = (temp.currentTouch.y - temp.lastTouch.y);
 			ratio_slider.move(temp.currentTouch.y);
 		}
 	}
@@ -477,6 +458,10 @@ class MultiTouchController {// Used to process the android API touch events for
 				mTContainer.add(finger);
 				ratio_slider.selected = true;
 			}
+		}
+		else if(me.pointerCount>=4){
+			warpicActivity.edit_ratio=false;
+			warpicActivity.fingersOnScreen = true;
 		}
 	}
 }
