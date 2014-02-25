@@ -13,7 +13,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -23,6 +22,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
+//import processing.event.KeyEvent;
 //import processing.event.KeyEvent;
 
 public class WarpicActivity extends PApplet { // PApplet in fact extends
@@ -73,10 +73,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	public static boolean warp_selected=true;
 	public ArrayList<Weight> weights_a, weights_b, weights_c, weights_d, weights_bounding_box;
 	public static boolean regrab_touched;
-	public boolean draw_finger_paths;
+	public boolean draw_finger_paths,edit_ratio;
 	private Pt ctr_of_roi;
 	static public boolean regrab_save;
 	public static MotionPath reset_to_motion_path;
+	public EditRatioSlider ratio_slider;
+	private MultiTouchController editRatioTouchHandler;
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
@@ -134,19 +136,23 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		allocVertices(); // ML: alloc all grid points before starting animation
 		effects_path = new MotionPath("smile");
 		// smile.initSmile();
-		mController = new MultiTouchController(menu, effects_path, this);
+		ratio_slider = new EditRatioSlider(this, new Pt(displayWidth-40,40), displayHeight-80);
+		ratio_slider.move(-111);
+		editRatioTouchHandler = new MultiTouchController(menu, effects_path, ratio_slider, this);
+		mController = new MultiTouchController(menu, effects_path, ratio_slider, this);
 		regrab = false;
 		showPrimeSpirals = false;
 		L = new Pair();
 		R = new Pair();
-				
+		edit_ratio = true;
 		regrab_touched= false;
 		draw_finger_paths=true;
 		compute_bary=false;
 		reset_to_motion_path= new MotionPath("RESET");
 		ctr_of_roi= new Pt();
 		find_proxy_center= true;
-		littleR=100;
+		
+
 	}
 
 	public void draw() {
@@ -161,7 +167,11 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 				for (MyMotionEvent me : l) {
 					mController.handle_triangle(me);
 				}
-			} else {
+			} else if(edit_ratio){
+				for (MyMotionEvent me : l){
+					editRatioTouchHandler.handle_edit_ratio(me);
+				}
+			}else {
 				for (MyMotionEvent me : l) {
 					mController.handle(me);
 				}
@@ -184,15 +194,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			mController.updateHistory();// Record the position once per frame
 			if(!editWarp){	
 				
-				noFill();
-				stroke(0);
-				strokeWeight(12);
-			//	setPairsDev();
-			//	bigR = findFurthestFinger(L,R);
-			//	ctr_of_roi= findCtr(L,R);
-			//	ellipse(ctr_of_roi.x,ctr_of_roi.y, bigR*2, bigR*2);
-			//	ellipse(ctr_of_roi.x,ctr_of_roi.y, littleR*2, littleR*2);
-			//	ctr_of_roi.show(ctr_of_roi,this);
 			}
 			else{
 				//TODO: the user must apply displacement for the canned warp to take effect
@@ -228,14 +229,10 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		if (showWarp) { showWarp();	}
 		
 		if(draw_finger_paths){ draw_finger_paths();}
-	
-//		textSize(32);
-//		stroke(0,255,0);
-//		strokeWeight(10);
-//		text("CTR: "+ctr_of_roi,150,150);
-//		text("L.A0:" +L.A0,150,250);
-//		text("R.A0: "+R.A0,150,350);
-
+		
+		if(edit_ratio){
+			ratio_slider.draw();
+		}
 	}// End of draw
 
 	private void editWarp() {
@@ -334,6 +331,14 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		float div = r/R;
 		temp.mul(div);
 		temp.add(ctr);
+		return temp; 
+	}
+	
+	private Pt perform_proxy_calculations(Pt a0, float ratio, Pt pt) {
+		Pt temp= new Pt();
+		temp = temp.copy(a0.subtract(pt));
+		temp.mul(ratio);
+		temp.add(pt);
 		return temp; 
 	}
 
@@ -526,7 +531,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, bigR*2, bigR*2);
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, littleR*2, littleR*2);
 		ctr_of_roi.show(ctr_of_roi,this);
-		proxy_pairs(L,R,bigR,littleR,ctr_of_roi);
+		proxy_pairs(L,R,1,ctr_of_roi);
 		calculate_warp(L,R);
 	}
 
@@ -535,6 +540,22 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		proxy_pair(r2,R, r, new Pt(ctr.x,ctr.y));
 		
 	}
+
+	private void proxy_pairs(Pair l2, Pair r2,float ratio,Pt ctr) {
+		proxy_pair(l2,ratio, new Pt(ctr.x,ctr.y));
+		proxy_pair(r2,ratio, new Pt(ctr.x,ctr.y));
+		
+	}
+	
+	private void proxy_pair(Pair l2, float ratio, Pt pt) {
+		l2.A0 = perform_proxy_calculations(l2.A0,ratio, pt);
+		l2.B0 = perform_proxy_calculations(l2.B0,ratio, pt);
+		l2.A1 = perform_proxy_calculations(l2.A1,ratio, pt);
+		l2.B1 = perform_proxy_calculations(l2.B1,ratio, pt);
+		
+	}
+
+
 
 	private void debugTextSetup() {
 		textSize(32);

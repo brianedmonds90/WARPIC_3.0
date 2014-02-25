@@ -21,6 +21,7 @@ class MultiTouchController {// Used to process the android API touch events for
 	double initTime, liftTime, elapsedTime;
 	boolean recordTime;
 	private WarpicActivity warpicActivity;
+	private EditRatioSlider ratio_slider;
 	MultiTouchController(int num) {
 		mTContainer = new ArrayList<MultiTouch>(num);
 		for (int i = 0; i < num; i++) {
@@ -61,6 +62,12 @@ class MultiTouchController {// Used to process the android API touch events for
 			WarpicActivity wActivity) {
 		this(menu2,effects_path);
 		warpicActivity = wActivity;
+	}
+
+	public MultiTouchController(Menu menu2, MotionPath effects_path,
+			EditRatioSlider rs, WarpicActivity warpicActivity2) {
+		this(menu2,effects_path,warpicActivity2);
+		ratio_slider = rs;
 	}
 
 	public void init() {// Puts disk objects on the screen to be moved around
@@ -421,4 +428,55 @@ class MultiTouchController {// Used to process the android API touch events for
 		wp.endShape();
 	}
 
+	public void handle_edit_ratio(MyMotionEvent me) {
+		if (me.action == 1) {// The user has touched the screen
+			touch_slider(me); // Register the touch event
+		} else if (me.action == 0) {// The user has lifted their fingers from the screen
+			// Register the lift event
+			lift_slider(me);
+		} else {
+			move_slider(me);
+		}
+		
+	}
+
+	private void move_slider(MyMotionEvent me) {
+		MultiTouch temp = null;
+		/**
+		 * TODO: Index out of bounds exception
+		 */
+		if(mTContainer.size()>0)
+		if(me.pointerId== 0){
+			temp = mTContainer.get(0);
+			// log the current position of the users fingers
+			temp.currentTouch = new Pt(me.loc.x, me.loc.y);
+			// calculate the distance moved from the previous frame and move the point
+			float displacement = (temp.currentTouch.y - temp.lastTouch.y);
+			ratio_slider.move(temp.currentTouch.y);
+		}
+	}
+
+	private void lift_slider(MyMotionEvent me) {
+	
+		if (me.pointerCount == 1 && ratio_slider.selected) {
+			ratio_slider.selected=false;
+			mTContainer.clear();
+		}		
+	}
+
+	private void touch_slider(MyMotionEvent me) {
+		Pt cTouch = new Pt(me.loc.x, me.loc.y);
+		MultiTouch finger;
+		if(ratio_slider.grabbed(cTouch)){
+			if (mTContainer.size() < 1) {// Adjust this number to adjust the number
+										// of fingers that you want to use
+				finger = new MultiTouch(cTouch.x, cTouch.y);
+				finger.selected = true;
+				finger.meIndex = me.pointerId;
+				finger.lastTouch = cTouch;
+				mTContainer.add(finger);
+				ratio_slider.selected = true;
+			}
+		}
+	}
 }
