@@ -5,7 +5,7 @@ import processing.core.PApplet;
 class Menu {
 	  Button playAnimation, sendAnimation, showSpirals,showEdges, 
 	  	loadMotionPath, showTexture, editWarp, saveWarpPath, showWarp,showHistory,
-	  	reset;
+	  	reset,showSlider;
 	  int menuH;
 	  int menuW;
 	  WarpicActivity myPa;
@@ -22,6 +22,7 @@ class Menu {
 		showWarp = new Button("Show Warp",0,0,pa);
 		showHistory= new Button("Show History", 0, 0, pa);
 		reset= new Button("Reset",0,0,pa);
+		showSlider = new Button("Show Slider", 0, 0, pa);
 		myPa= pa;
 		reArrange();
 	  }
@@ -49,6 +50,8 @@ class Menu {
 		  showHistory.y=showWarp.y-showHistory.bHeight;
 		  reset.x=myPa.width-reset.bWidth;
 		  reset.y= showHistory.y-reset.bHeight;
+		  showSlider.y= reset.y;
+		  showSlider.x = reset.x-showSlider.bWidth;
 	  }
 	  
 	  void draw(PApplet pa) {
@@ -64,6 +67,7 @@ class Menu {
 		  showWarp.draw(pa);
 		  showHistory.draw(pa);
 		  reset.draw(pa);
+		  showSlider.draw(pa);
 	  }
 	 
 	  void buttonPressed(Pt p) {
@@ -78,6 +82,7 @@ class Menu {
 		  showWarp.pressed(p);
 		  showHistory.pressed(p);
 		  reset.pressed(p);
+		  showSlider.pressed(p);
 	  }
 	  
 	  void buttonLifted(){
@@ -123,6 +128,10 @@ class Menu {
 		  else if(reset.pressed){
 			  myPa.load_warp_points(myPa.reset_to_motion_path);
 		  }
+		  else if(showSlider.pressed){
+			  myPa.edit_ratio= !myPa.edit_ratio;
+			  myPa.showMenu = false;
+		  }
 		  unPressAll();
 	  }
 	  
@@ -138,6 +147,7 @@ class Menu {
 		  showWarp.pressed=false;
 		  showHistory.pressed=false;
 		  reset.pressed=false;
+		  showSlider.pressed=false; 	
 	  }
 
 	  public void motion(MyMotionEvent me) {

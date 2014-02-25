@@ -144,9 +144,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		showPrimeSpirals = false;
 		L = new Pair();
 		R = new Pair();
-		edit_ratio = true;
+		edit_ratio = false;
 		regrab_touched= false;
-		draw_finger_paths=true;
+		draw_finger_paths=false;
 		compute_bary=false;
 		reset_to_motion_path= new MotionPath("RESET");
 		ctr_of_roi= new Pt();
@@ -190,7 +190,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			first_load_canned_warp=false;
 		}
 		
-		if (fingersOnScreen){
+		if (fingersOnScreen&&!showMenu){
 			mController.updateHistory();// Record the position once per frame
 			if(!editWarp){	
 				
@@ -232,6 +232,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		
 		if(edit_ratio){
 			ratio_slider.draw();
+			debugTextSetup();
+			text("RATIO: "+ratio_slider.getRatio(),150,150);
+			
 		}
 	}// End of draw
 
@@ -465,23 +468,15 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			tracking = 0;
 			firstFrame = true;
 		}
-//		animateUpdate_2(tracking, _A, _B, _C, _D);
+		
 		L = L.setPair(_A, _B, tracking);
 		R = R.setPair(_C, _D, tracking);
 		// Advance the current pairs along the user's path
 		bigR = findFurthestFinger(L,R);
 		ctr_of_roi= findCtr(L,R);
-		float littleR = 150;
-		proxy_pairs(L,R,bigR,littleR,ctr_of_roi);
+		proxy_pairs(L,R,ratio_slider.getRatio(),ctr_of_roi);
 		calculate_warp(L,R);
-//		L = L.setPair(_A, _B, tracking);
-//		R = R.setPair(_C, _D, tracking);
-		//proxy_pairs();
-	//	calculate_warp();
-
 	}
-
-
 
 	public void animateWarping(MotionPath mp, double _ellapsed_time){
 		int numFrames = max(max(mp.A.size(), mp.B.size()),
@@ -527,11 +522,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}
 		bigR = findFurthestFinger(L,R);
 		ctr_of_roi= findCtr(L,R);
-		float littleR = 150;
+		
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, bigR*2, bigR*2);
+		float littleR = bigR*ratio_slider.getRatio();
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, littleR*2, littleR*2);
 		ctr_of_roi.show(ctr_of_roi,this);
-		proxy_pairs(L,R,1,ctr_of_roi);
+		proxy_pairs(L,R,ratio_slider.getRatio(),ctr_of_roi);
 		calculate_warp(L,R);
 	}
 

@@ -45,6 +45,11 @@ public class EditRatioSlider {
 		}
 	}
 
+	public float getRatio(){
+		
+		return location.y/ratio_pt.y;
+	}
+	
 	public boolean grabbed(Pt cTouch) {
 		float disFromCenter = (cTouch.x - ratio_pt.x)*(cTouch.x - ratio_pt.x)+
 				((cTouch.y - ratio_pt.y)*(cTouch.y - ratio_pt.y));
