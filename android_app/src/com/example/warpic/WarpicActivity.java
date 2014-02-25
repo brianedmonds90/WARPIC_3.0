@@ -137,7 +137,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		effects_path = new MotionPath("smile");
 		// smile.initSmile();
 		ratio_slider = new EditRatioSlider(this, new Pt(displayWidth-40,40), displayHeight-80);
-		ratio_slider.move(-111);
 		editRatioTouchHandler = new MultiTouchController(menu, effects_path, ratio_slider, this);
 		mController = new MultiTouchController(menu, effects_path, ratio_slider, this);
 		regrab = false;
@@ -151,7 +150,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		reset_to_motion_path= new MotionPath("RESET");
 		ctr_of_roi= new Pt();
 		find_proxy_center= true;
-		
 
 	}
 
@@ -207,6 +205,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 		if(!editWarp){
 			if (fingersOnScreen || realTimeWarp) {// The user has put their fingers on the screen to begin warping
+				noFill();
 				realTimeWarp();
 			}
 		}
@@ -231,11 +230,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		if(draw_finger_paths){ draw_finger_paths();}
 		
 		if(edit_ratio){
+			
 			ratio_slider.draw();
-			debugTextSetup();
-			text("RATIO: "+ratio_slider.getRatio(),150,150);
 			
 		}
+		debugTextSetup();
+		text("RATIO: "+ratio_slider.getRatio(),150,150);
 	}// End of draw
 
 	private void editWarp() {

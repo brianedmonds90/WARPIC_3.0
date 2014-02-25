@@ -10,9 +10,7 @@ public class EditRatioSlider {
 		wp = w;
 		location = loc;
 		length = len;
-		ratio = 1;
-		ratio_pt = loc.copy(loc);
-		ratio_pt.mul(1);
+		ratio_pt = new Pt(location.x,location.y+length);
 		selected = false;
 		ratio_pt_radius = 40;
 	}
@@ -31,6 +29,7 @@ public class EditRatioSlider {
 			wp.fill(0);
 		}
 		ratio_pt.show(ratio_pt, ratio_pt_radius, wp);
+		wp.text("RATIO POINT.y"+ ratio_pt.y, 150, 250);
 	}
 	
 	public void move(float displacement){
@@ -46,8 +45,8 @@ public class EditRatioSlider {
 	}
 
 	public float getRatio(){
-		
-		return location.y/ratio_pt.y;
+
+		return location.disTo(ratio_pt)/length;
 	}
 	
 	public boolean grabbed(Pt cTouch) {
