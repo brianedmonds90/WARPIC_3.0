@@ -33,7 +33,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	int n = 50; // size of grid. Must be >2!
 	Pair initL, initR;
 	Pt[][] G = new Pt[n][n]; // array of vertices
-	boolean showVertices = false, showEdges = true, showTexture = false; // flags for rendering vertices and edges
+	boolean showVertices = false, showEdges = false, showTexture = true; // flags for rendering vertices and edges
 	static boolean showWarp = false;
 
 	float w, h, ww, hh; // width, height of cell in absolute and normalized units
@@ -115,7 +115,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		showMenu = false;
 		tracking = 0;
 		counter = 0;
-		showSpirals = true;
+		showSpirals = false;
 		
 		ww = (float) (1.0 / (n - 1));
 		hh = (float) (1.0 / (n - 1)); // set intial width and height of a cell
@@ -235,7 +235,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			
 		}
 		debugTextSetup();
-		text("RATIO: "+ratio_slider.getRatio(),150,150);
+		//text("RATIO: "+ratio_slider.getRatio(),150,150);
 	}// End of draw
 
 	private void editWarp() {
@@ -522,7 +522,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}
 		bigR = findFurthestFinger(L,R);
 		ctr_of_roi= findCtr(L,R);
-		
+		stroke(0,255,0);
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, bigR*2, bigR*2);
 		float littleR = bigR*ratio_slider.getRatio();
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, littleR*2, littleR*2);

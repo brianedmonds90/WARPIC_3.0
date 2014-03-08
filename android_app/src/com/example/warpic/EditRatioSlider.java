@@ -6,11 +6,13 @@ public class EditRatioSlider {
 	Pt location, ratio_pt;
 	float length,ratio_pt_radius;
 	public boolean selected;
+	Pt center;
 	public EditRatioSlider(WarpicActivity w, Pt loc, float len){
 		wp = w;
 		location = loc;
 		length = len;
-		ratio_pt = new Pt(location.x,location.y+length);
+		center = new Pt(location.x,location.y+length/2.0f);
+		ratio_pt = new Pt(location.x,location.y+length/2.0f);
 		selected = false;
 		ratio_pt_radius = 40;
 	}
@@ -29,7 +31,6 @@ public class EditRatioSlider {
 			wp.fill(0);
 		}
 		ratio_pt.show(ratio_pt, ratio_pt_radius, wp);
-		wp.text("RATIO POINT.y"+ ratio_pt.y, 150, 250);
 	}
 	
 	public void move(float displacement){
@@ -46,7 +47,7 @@ public class EditRatioSlider {
 
 	public float getRatio(){
 
-		return location.disTo(ratio_pt)/length;
+		return (location.disTo(ratio_pt)/(length/2.0f));
 	}
 	
 	public boolean grabbed(Pt cTouch) {
