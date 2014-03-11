@@ -47,10 +47,10 @@ class Pair {
     pa.strokeWeight(8);
     pa.stroke(255,0,0);
     show0(pa);
-    pa.stroke(0,255,0);
-    show1(pa); 
     pa.stroke(0,0,255);
     showt(pa); 
+    pa.stroke(0,255,0);
+    show1(pa); 
     pa.noStroke(); 
     return this; 
   }

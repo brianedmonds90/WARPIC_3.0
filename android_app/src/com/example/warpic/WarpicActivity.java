@@ -33,7 +33,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	int n = 50; // size of grid. Must be >2!
 	Pair initL, initR;
 	Pt[][] G = new Pt[n][n]; // array of vertices
-	boolean showVertices = false, showEdges = false, showTexture = true; // flags for rendering vertices and edges
+	boolean showVertices = false, showEdges = true, showTexture = false; // flags for rendering vertices and edges
 	static boolean showWarp = false;
 
 	float w, h, ww, hh; // width, height of cell in absolute and normalized units
@@ -46,7 +46,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	float bigR;
 	static boolean showController, fingersOnScreen, animate, firstPass,
 			saveWarp, showPrimeSpirals, first_load_canned_warp, find_proxy_center;
-	Pair L, R; // Declare warping pairs
+	//Pair L, R; // Declare warping pairs
 	float roi, t, f,littleR;
 	static int tracking;
 	public static boolean grabPoints, writePaths;
@@ -64,8 +64,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	ParseObject testObject;
 	ParseFile imageParseFile;
 	StringBuilder motionStrBuilder;
-	static double ellapsed_time;
-	
+	static double ellapsed_time;	
 	static MotionPath effects_path;
 	static boolean editWarp;
 	public static boolean compute_bary;
@@ -78,14 +77,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	static public boolean regrab_save;
 	public static MotionPath reset_to_motion_path;
 	public EditRatioSlider ratio_slider;
-	private MultiTouchController editRatioTouchHandler;
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
 
 		Parse.initialize(this, "BgpuXDtTXuLyXOyv5A6sEs6ehKqcaXakOC7Mg13N",
-				"A8pFBNRcLjGrhclpFFvJFNXsMaZyOfZypjiKlPjD");
-		
+				"A8pFBNRcLjGrhclpFFvJFNXsMaZyOfZypjiKlPjD");	
 		testObject = new ParseObject("TestObject");
 		motionStrBuilder = new StringBuilder();
 		motionString = "";
@@ -123,7 +120,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		h = displayHeight * hh; // set intial width and height of a cell in
 								// normalized [0,1]x[0,1]
 		menu = new Menu(this);
-
 		l = new ArrayList<MyMotionEvent>();
 		showController = true;
 		fingersOnScreen = false;
@@ -133,16 +129,17 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		createNewController = false;
 		firstFrame = true;
 		realTimeWarp = false;
+		
 		allocVertices(); // ML: alloc all grid points before starting animation
+		
+		//******Global Variables that could use some refactoring
 		effects_path = new MotionPath("smile");
-		// smile.initSmile();
+		
 		ratio_slider = new EditRatioSlider(this, new Pt(displayWidth-40,40), displayHeight-80);
-		editRatioTouchHandler = new MultiTouchController(menu, effects_path, ratio_slider, this);
 		mController = new MultiTouchController(menu, effects_path, ratio_slider, this);
 		regrab = false;
 		showPrimeSpirals = false;
-		L = new Pair();
-		R = new Pair();
+		
 		edit_ratio = false;
 		regrab_touched= false;
 		draw_finger_paths=false;
@@ -154,6 +151,10 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	public void draw() {
+		//The pairs that form the warping edges
+		Pair L = new Pair();
+		Pair R = new Pair();
+		
 		background(255);
 		synchronized (l) {// handle the previously queued motion events
 			if (showMenu) {
@@ -165,11 +166,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 				for (MyMotionEvent me : l) {
 					mController.handle_triangle(me);
 				}
-			} else if(edit_ratio){
-				for (MyMotionEvent me : l){
-					editRatioTouchHandler.handle_edit_ratio(me);
-				}
-			}else {
+			} 
+			else {
 				for (MyMotionEvent me : l) {
 					mController.handle(me);
 				}
@@ -190,33 +188,47 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		
 		if (fingersOnScreen&&!showMenu){
 			mController.updateHistory();// Record the position once per frame
+			ratio_slider.updateHistory(); //update the current history list
 			if(!editWarp){	
 				
 			}
 			else{
 				//TODO: the user must apply displacement for the canned warp to take effect
-				editWarp();
+				editWarp(L,R);
 			}
 		}
 		
-		if (grabPoints) { grabPoints(); }
+		if (grabPoints) { grabPoints(L,R); }
 
 		if (!saveWarp) resetVertices();
 
 		if(!editWarp){
 			if (fingersOnScreen || realTimeWarp) {// The user has put their fingers on the screen to begin warping
 				noFill();
-				realTimeWarp();
+				realTimeWarp(L,R);
 			}
 		}
 		
-		if (animate) { animate(); }// end of animate
+		if (animate) { animate(L,R); }// end of animate
 
 		if (showEdges) drawEdges();
 
 		if (showTexture) paintImage(myImage);
 
-		if (showSpirals) {showSpirals();}
+		if (showSpirals) {
+			try{
+				L.showAll(this);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			try{
+				R.showAll(this);	
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 
 		if (saveWarp) { saveWarp(); }
 		
@@ -229,22 +241,23 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		
 		if(draw_finger_paths){ draw_finger_paths();}
 		
-		if(edit_ratio){
-			
-			ratio_slider.draw();
-			
-		}
+		if(!animate){ratio_slider.draw();}
+
+	
+	
 		debugTextSetup();
-		//text("RATIO: "+ratio_slider.getRatio(),150,150);
+		text("Ratio: "+ratio_slider.getRatio(),150,150);
+		
+
 	}// End of draw
 
-	private void editWarp() {
+	private void editWarp(Pair L, Pair R) {
 		Pt v1 = mController.getDiskAt(0);
 		Pt v2 = mController.getDiskAt(1);
 		Pt v3 = mController.getDiskAt(2);
 		displaceBoundingBox(effects_path, v1, v2, v3);
 		editWarp(effects_path.A, effects_path.B, effects_path.C,
-		effects_path.D, v1, v2, v3);
+		effects_path.D, v1, v2, v3,L,R);
 		effects_path.drawBoundingBox(this);
 		mController.showTriangle(this);
 	}
@@ -257,7 +270,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	private void createNewController() {
-		mController = new MultiTouchController(menu);
+		mController = new MultiTouchController(menu,effects_path, ratio_slider, this);
 		createNewController = false;
 	}
 
@@ -277,17 +290,16 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 				mController.show(this);
 			}
 		}
-
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 
-	private void animate() {
+	private void animate(Pair L, Pair R) {
 		if (firstFrame) {
 			firstFrameT = System.nanoTime() / 1000000000.0;
-			firstFrame = false;
+			getReadyToAnimate_1(L, R);
+			firstFrame = false;	
 		}
 		if (writePaths) {
 			writePathsFile(motionFile, makePtsString());
@@ -296,21 +308,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}
 		noFill();
 		stroke(0,255,0);
-		effects_path.showPaths(this);
 		animateWarping_1(effects_path.A, effects_path.B, effects_path.C,
-				effects_path.D, ellapsed_time);
-
-		
-	}
-
-	private void showSpirals() {
-		try {
-			R.showAll(this);
-			L.showAll(this);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+				effects_path.D, ellapsed_time,ratio_slider,L,R);
 	}
 
 	private void showWarp() {
@@ -320,7 +319,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		effects_path.showPaths(this);
 	}
 
-	private void grabPoints() {
+	private void grabPoints(Pair L, Pair R) {
 		L.writePairsToFile(motionFile);
 		R.writePairsToFile(motionFile);
 		motionString += L.addToString();
@@ -398,7 +397,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 	
 	private void editWarp(ArrayList<Pt> a2, ArrayList<Pt> b2, ArrayList<Pt> c2,
-			ArrayList<Pt> d2, Pt v1, Pt v2, Pt v3) {
+			ArrayList<Pt> d2, Pt v1, Pt v2, Pt v3, Pair L, Pair R) {
 		// Clear the current loactions of the warp motion paths
 		a2.clear();
 		b2.clear();
@@ -457,18 +456,22 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	private void animateWarping_1(ArrayList<Pt> _A, ArrayList<Pt> _B,
-			ArrayList<Pt> _C, ArrayList<Pt> _D, double _ellapsed_time) {
+			ArrayList<Pt> _C, ArrayList<Pt> _D, double _ellapsed_time, EditRatioSlider ratio_slider,Pair L,Pair R) {
 		int numFrames = max(max(_A.size(), _B.size()),
 				max(_C.size(), _D.size()));
 		double currentT = (System.nanoTime() / 1000000000.0) - firstFrameT;
 		tracking = computeAnimationFrame(currentT, _ellapsed_time, numFrames);
-		textSize(50);
-		fill(0);
 		if (tracking > numFrames) {
 			tracking = 0;
 			firstFrame = true;
 		}
-		
+
+		debugTextSetup();
+		text("tracking: "+tracking, 150,250);
+		text("numFrames: "+numFrames,100,350);
+		text("firstFrameT: "+firstFrameT,100,450);
+		text("currentT: "+currentT,100,550);
+		text("ellapsed time: "+_ellapsed_time,100,650);
 		L = L.setPair(_A, _B, tracking);
 		R = R.setPair(_C, _D, tracking);
 		// Advance the current pairs along the user's path
@@ -483,39 +486,18 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 				max(mp.C.size(), mp.D.size()));
 		double currentT = (System.nanoTime() / 1000000000.0) - firstFrameT;
 		tracking = computeAnimationFrame(currentT, _ellapsed_time, numFrames);
-		Pair leftHand = new Pair();
-		Pair rightHand = new Pair();
-		
-		//animateUpdate(tracking,mp,leftHand,rightHand);
-		
-		
 	}
 	
-	private void animateUpdate(int index, MotionPath mp) {
-		if (mp.A.size() > index) {
-			L.A1 = mp.A.get(index);
-		}
-		if (mp.B.size() > index)
-			L.B1 = mp.B.get(index);
-		if (mp.C.size() > index)
-			R.A1 = mp.C.get(index);
-		if (mp.D.size() > index)
-			R.B1 = mp.D.get(index);
-		
-	}
-
-	private void realTimeWarp() {
-		Pair leftHand = new Pair();
-		Pair rightHand= new Pair();
+	private void realTimeWarp(Pair L, Pair R) {
 		try {
 			int index = Math.min(mController.getHistoryOf(0).size(), 
 					mController.getHistoryOf(1).size());
 			index--;
-			L =  leftHand.setPair(mController.getHistoryOf(0),mController.getHistoryOf(1),index);
+			L =  L.setPair(mController.getHistoryOf(0),mController.getHistoryOf(1),index);
 			index = Math.min(mController.getHistoryOf(2).size(), 
 					mController.getHistoryOf(3).size());
 			index--;
-			R = rightHand.setPair(mController.getHistoryOf(2),mController.getHistoryOf(3),index);
+			R = R.setPair(mController.getHistoryOf(2),mController.getHistoryOf(3),index);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -531,12 +513,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		calculate_warp(L,R);
 	}
 
-	private void proxy_pairs(Pair l2, Pair r2,float R,float r,Pt ctr) {
-		proxy_pair(l2,R,r, new Pt(ctr.x,ctr.y));
-		proxy_pair(r2,R, r, new Pt(ctr.x,ctr.y));
-		
-	}
-
 	private void proxy_pairs(Pair l2, Pair r2,float ratio,Pt ctr) {
 		proxy_pair(l2,ratio, new Pt(ctr.x,ctr.y));
 		proxy_pair(r2,ratio, new Pt(ctr.x,ctr.y));
@@ -550,9 +526,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		l2.B1 = perform_proxy_calculations(l2.B1,ratio, pt);
 		
 	}
-
-
-
+	
 	private void debugTextSetup() {
 		textSize(32);
 		stroke(255,0,0);
@@ -560,13 +534,13 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		noFill();
 	}
 
-	private void calculate_warp() {
-		roi = d(L.ctr(this), R.ctr(this)); // Find the region of influence for the warping
-		L.evaluate(1, this);
-		R.evaluate(1, this);
-		warpVertices(L, 1, roi);// Warp the vertices
-		warpVertices(R, 1, roi);
-	}
+//	private void calculate_warp() {
+//		roi = d(L.ctr(this), R.ctr(this)); // Find the region of influence for the warping
+//		L.evaluate(1, this);
+//		R.evaluate(1, this);
+//		warpVertices(L, 1, roi);// Warp the vertices
+//		warpVertices(R, 1, roi);
+//	}
 	
 	private void calculate_warp(Pair l2, Pair r2) {
 		roi = d(l2.ctr(this), r2.ctr(this)); // Find the region of influence for the warping
@@ -576,54 +550,11 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		warpVertices(r2, 1, roi);
 	}
 
-	private void proxy_pairs() {
-		proxy_pair(L,bigR,littleR,new Pt(ctr_of_roi.x,ctr_of_roi.y));
-		proxy_pair(R,bigR, littleR, new Pt(ctr_of_roi.x,ctr_of_roi.y));
-	}
-
-	
-	private void proxy_pair(Pair l2, float bigR2, float littleR2, Pt copy) {
-		l2.A0 = perform_proxy_calculations(l2.A0,bigR, littleR, copy);
-		l2.B0 = perform_proxy_calculations(l2.B0,bigR, littleR, copy);
-		l2.A1 = perform_proxy_calculations(l2.A1,bigR, littleR, copy);
-		l2.B1 = perform_proxy_calculations(l2.B1,bigR, littleR, copy);
-	}
-
 	private Pt findCtr(Pair l2, Pair r2) {
 		Pt ret = new Pt();
 		ret= this.average(r2.ctr(this),l2.ctr(this));
 		find_proxy_center=false;
 		return ret;
-	}
-
-	private void animateUpdate_2(int index, ArrayList<Pt> _a, ArrayList<Pt> _b,
-			ArrayList<Pt> _c, ArrayList<Pt> _d) {
-		if (_a.size() > index) {
-			L.A1 = _a.get(index);
-		}
-		if (_b.size() > index)
-			L.B1 = _b.get(index);
-		if (_c.size() > index)
-			R.A1 = _c.get(index);
-		if (_d.size() > index)
-			R.B1 = _d.get(index);
-	}
-
-	private void setPairsDev() {
-		if (mController.getHistoryOf(0).size() > 0
-				&& mController.getHistoryOf(1).size() > 0
-				&& mController.getHistoryOf(2).size() > 0
-				&& mController.getHistoryOf(3).size() > 0) {
-			ArrayList<Pt> listA, listB, listC, listD;
-			listA = mController.getHistoryOf(0);
-			listB = mController.getHistoryOf(1);
-			listC = mController.getHistoryOf(2);
-			listD = mController.getHistoryOf(3);
-			L = new Pair(listA.get(0), listB.get(0),
-					listA.get(listA.size() - 1), listB.get(listB.size() - 1));
-			R = new Pair(listC.get(0), listD.get(0),
-					listC.get(listC.size() - 1), listD.get(listD.size() - 1));
-		}
 	}
 	
 	/********************************************************************************************/
@@ -678,7 +609,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		saveWarp = false;
 	}
 
-	void getReadyToAnimate_1() {
+	void getReadyToAnimate_1(Pair L, Pair R) {
 		effects_path.A = mController.getHistoryOf(0);
 		effects_path.B = mController.getHistoryOf(1);
 		effects_path.C = mController.getHistoryOf(2);
@@ -688,12 +619,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		L.B0.setTo(effects_path.B.get(0));
 		R.A0.setTo(effects_path.C.get(0));
 		R.B0.setTo(effects_path.D.get(0));
-		
-		//TESTING
-	//	bigR = findFurthestFinger(L,R);
-	//	ctr_of_roi= findCtr(L,R);
-		//END OF Testing
-	
 	}
 
 	int whichAction(MotionEvent me) { // 1=press, 0=release, 2=drag
@@ -825,7 +750,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		Pt QLt = LPair.warp(Q0, f, this);
 		Pt QRt = R.warp(Q0, f, this);
 		float dL = d(Q0, LPair.ctr(this)), dR = d(Q0, R.ctr(this));
-		float roi = d(LPair.ctr(this), R.ctr(this));
+		//float roi = d(LPair.ctr(this), R.ctr(this));
 		float a = dL / (dL + dR);
 		float cL = sq(cos(a * PI / 2)), cR = sq(sin(a * PI / 2));
 		return P(cL, QLt, cR, QRt);
@@ -1237,7 +1162,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	// file
 	public void timeToAnimate() {
 		if (!editWarp) {
-			getReadyToAnimate_1();
+			//getReadyToAnimate_1(L,R);
 			smooth(effects_path.A);
 			smooth(effects_path.B);
 			smooth(effects_path.C);
@@ -1354,7 +1279,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	//Seperates a text file into seperate ArrayLists each one represents a different fingers motions
 	public static void seperatePts(String [] ss,MotionPath mp) {  
 	  int spaces=0;
-	  ArrayList<String> myList=new ArrayList();
+	  ArrayList<String> myList=new ArrayList<String>();
 	  for (int i=0;i<ss.length;i++) {
 	    if (ss[i].equals("-")) {
 	      if (spaces==0) {

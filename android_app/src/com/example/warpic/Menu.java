@@ -107,7 +107,7 @@ class Menu {
 		  }
 		  else if(editWarp.pressed){
 			  try{
-				  myPa.getReadyToAnimate_1();
+			//	  myPa.getReadyToAnimate_1();
 			  }
 			  catch(Exception e){
 				  e.printStackTrace();

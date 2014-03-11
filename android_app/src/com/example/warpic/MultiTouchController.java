@@ -22,6 +22,7 @@ class MultiTouchController {// Used to process the android API touch events for
 	boolean recordTime;
 	private WarpicActivity warpicActivity;
 	private EditRatioSlider ratio_slider;
+	boolean editRatio;
 	MultiTouchController(int num) {
 		mTContainer = new ArrayList<MultiTouch>(num);
 		for (int i = 0; i < num; i++) {
@@ -43,6 +44,7 @@ class MultiTouchController {// Used to process the android API touch events for
 	MultiTouchController(Menu myMenu) {
 		this();
 		menu = myMenu;
+		editRatio = false;
 	}
 	
 	MultiTouchController(Menu myMenu,MotionPath mPath) {
@@ -80,39 +82,47 @@ class MultiTouchController {// Used to process the android API touch events for
 	public void touch(MyMotionEvent ev) {// Method used when a touch event happens
 		Pt cTouch = new Pt(ev.loc.x, ev.loc.y);
 		MultiTouch finger;
-		if (recordTime) {
-			initTime = ev.nanoTime / 1000000000.0;
-			recordTime = false;
+		//If it's the first finger down and the user is touching the ratio slider
+		if(ev.pointerCount==1&&ratio_slider.grabbed(cTouch)){
+			editRatio = true;
+			handle_edit_ratio(ev);
 		}
-		
-		if(WarpicActivity.regrab){
-			WarpicActivity.regrab_save=true;
-			WarpicActivity.regrab_touched=true;
-		}
-		
-		if (mTContainer.size() < 4) {// Adjust this number to adjust the number
-										// of fingers that you want to use
-			finger = new MultiTouch(cTouch.x, cTouch.y);
-			finger.selected = true;
-			finger.meIndex = ev.pointerId;
-			finger.lastTouch = cTouch;
-			finger.downTime = ev.nanoTime / 1000000000.0;
-			mTContainer.add(finger);
-			if (mTContainer.size() == 4) {// && !WarpicActivity.fingersOnScreen
-				WarpicActivity.fingersOnScreen = true;
+		//Else touch the multitouch disk
+		else{
+			if (recordTime) {
+				initTime = ev.nanoTime / 1000000000.0;
+				recordTime = false;
 			}
-			if (mTContainer.size() == 4 && !WarpicActivity.firstPass)
-				WarpicActivity.realTimeWarp = true;
-		} else {// We have four points on the screen, the user wants to move one
-				// of them
-			MultiTouch temp = findClosest(cTouch);
-			WarpicActivity.fingersOnScreen = true;
-			if (temp != null) {
-				temp.selected = true;
-				temp.meIndex = ev.pointerId;
-				temp.downTime = ev.nanoTime / 1000000000.0;
-				temp.lastTouch = cTouch; // Keep track of the touch location for
-											// movement
+			
+			if(WarpicActivity.regrab){
+				WarpicActivity.regrab_save=true;
+				WarpicActivity.regrab_touched=true;
+			}
+			
+			if (mTContainer.size() < 4) {// Adjust this number to adjust the number
+											// of fingers that you want to use
+				finger = new MultiTouch(cTouch.x, cTouch.y);
+				finger.selected = true;
+				finger.meIndex = ev.pointerId;
+				finger.lastTouch = cTouch;
+				finger.downTime = ev.nanoTime / 1000000000.0;
+				mTContainer.add(finger);
+				if (mTContainer.size() == 4) {// && !WarpicActivity.fingersOnScreen
+					WarpicActivity.fingersOnScreen = true;
+				}
+				if (mTContainer.size() == 4 && !WarpicActivity.firstPass)
+					WarpicActivity.realTimeWarp = true;
+			} else {// We have four points on the screen, the user wants to move one
+					// of them
+				MultiTouch temp = findClosest(cTouch);
+				WarpicActivity.fingersOnScreen = true;
+				if (temp != null) {
+					temp.selected = true;
+					temp.meIndex = ev.pointerId;
+					temp.downTime = ev.nanoTime / 1000000000.0;
+					temp.lastTouch = cTouch; // Keep track of the touch location for
+												// movement
+				}
 			}
 		}
 	}
@@ -287,15 +297,21 @@ class MultiTouchController {// Used to process the android API touch events for
 	}
 
 	void handle(MyMotionEvent me) {
-		if (me.action == 1) {// The user has touched the screen
-
-			touch(me); // Register the touch event
-		} else if (me.action == 0) {// The user has lifted their fingers from
+		//If the user is editing the ratio
+		if(editRatio){
+			handle_edit_ratio(me);
+		}
+		//Else they are warping
+		else{
+			if (me.action == 1) {// The user has touched the screen
+				touch(me); // Register the touch event
+			} else if (me.action == 0) {// The user has lifted their fingers from
 									// the screen
-			// Register the lift event
-			lift(me);
-		} else {
-			motion(me);// Register the motion event
+				// Register the lift event
+				lift(me);
+			} else {
+				motion(me);// Register the motion event
+			}
 		}
 	}
 
@@ -412,6 +428,7 @@ class MultiTouchController {// Used to process the android API touch events for
 
 	public void handle_edit_ratio(MyMotionEvent me) {
 		if (me.action == 1) {// The user has touched the screen
+			System.out.println("touch ratio");
 			touch_slider(me); // Register the touch event
 		} else if (me.action == 0) {// The user has lifted their fingers from the screen
 			// Register the lift event
@@ -441,8 +458,10 @@ class MultiTouchController {// Used to process the android API touch events for
 	
 		if (me.pointerCount == 1 && ratio_slider.selected) {
 			ratio_slider.selected=false;
+			
 			mTContainer.clear();
-		}		
+		}	
+		editRatio = false;
 	}
 
 	private void touch_slider(MyMotionEvent me) {

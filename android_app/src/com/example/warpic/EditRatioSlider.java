@@ -1,5 +1,7 @@
 package com.example.warpic;
 
+import java.util.ArrayList;
+
 public class EditRatioSlider {
 	float ratio;
 	WarpicActivity wp;
@@ -7,6 +9,7 @@ public class EditRatioSlider {
 	float length,ratio_pt_radius;
 	public boolean selected;
 	Pt center;
+	ArrayList<Float> history;
 	public EditRatioSlider(WarpicActivity w, Pt loc, float len){
 		wp = w;
 		location = loc;
@@ -15,6 +18,7 @@ public class EditRatioSlider {
 		ratio_pt = new Pt(location.x,location.y+length/2.0f);
 		selected = false;
 		ratio_pt_radius = 40;
+		history = new ArrayList<Float>();
 	}
 	
 	public void draw(){
@@ -57,5 +61,14 @@ public class EditRatioSlider {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	public void updateHistory(){
+		history.add(getRatio());
+	}
+	
+	public ArrayList<Float> getHistory(){
+		return history;
 	}
 }
