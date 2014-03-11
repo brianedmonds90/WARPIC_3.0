@@ -30,9 +30,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 	/****************************** INSTANCE VARIABLES ********************************/
 	String motionString;
-	int n = 50; // size of grid. Must be >2!
+	
 	Pair initL, initR;
-	Pt[][] G = new Pt[n][n]; // array of vertices
+	
 	boolean showVertices = false, showEdges = true, showTexture = false; // flags for rendering vertices and edges
 	static boolean showWarp = false;
 
@@ -77,6 +77,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	static public boolean regrab_save;
 	public static MotionPath reset_to_motion_path;
 	public EditRatioSlider ratio_slider;
+	Texture texture;
 	/****************************** END OF INSTANCE VARIABLES ****************************/
 
 	public void setup() {
@@ -101,6 +102,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		saveWarp = false;
 		grabPoints = false;
 		editWarp = false;
+		
+		texture = new Texture(displayWidth, displayHeight, this);
+
 		// *****************Weight lists for Barycentric coords
 		weights_a = new ArrayList<Weight>();
 		weights_b = new ArrayList<Weight>();
@@ -114,11 +118,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		counter = 0;
 		showSpirals = false;
 		
-		ww = (float) (1.0 / (n - 1));
-		hh = (float) (1.0 / (n - 1)); // set intial width and height of a cell
-		w = displayWidth * ww;
-		h = displayHeight * hh; // set intial width and height of a cell in
-								// normalized [0,1]x[0,1]
+		
 		menu = new Menu(this);
 		l = new ArrayList<MyMotionEvent>();
 		showController = true;
@@ -130,7 +130,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		firstFrame = true;
 		realTimeWarp = false;
 		
-		allocVertices(); // ML: alloc all grid points before starting animation
+		
 		
 		//******Global Variables that could use some refactoring
 		effects_path = new MotionPath("smile");
@@ -194,26 +194,26 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			}
 			else{
 				//TODO: the user must apply displacement for the canned warp to take effect
-				editWarp(L,R);
+				editWarp(L,R,mController);
 			}
 		}
 		
 		if (grabPoints) { grabPoints(L,R); }
 
-		if (!saveWarp) resetVertices();
+		if (!saveWarp) texture.resetVertices();
 
 		if(!editWarp){
 			if (fingersOnScreen || realTimeWarp) {// The user has put their fingers on the screen to begin warping
 				noFill();
-				realTimeWarp(L,R);
+				realTimeWarp(L,R,texture);
 			}
 		}
 		
 		if (animate) { animate(L,R); }// end of animate
 
-		if (showEdges) drawEdges();
+		if (showEdges) texture.drawEdges();
 
-		if (showTexture) paintImage(myImage);
+		if (showTexture) texture.paintImage(myImage);
 
 		if (showSpirals) {
 			try{
@@ -251,7 +251,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 	}// End of draw
 
-	private void editWarp(Pair L, Pair R) {
+	private void editWarp(Pair L, Pair R, MultiTouchController mController) {
 		Pt v1 = mController.getDiskAt(0);
 		Pt v2 = mController.getDiskAt(1);
 		Pt v3 = mController.getDiskAt(2);
@@ -309,7 +309,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		noFill();
 		stroke(0,255,0);
 		animateWarping_1(effects_path.A, effects_path.B, effects_path.C,
-				effects_path.D, ellapsed_time,ratio_slider,L,R);
+				effects_path.D, ellapsed_time,ratio_slider,L,R, texture);
 	}
 
 	private void showWarp() {
@@ -456,7 +456,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	}
 
 	private void animateWarping_1(ArrayList<Pt> _A, ArrayList<Pt> _B,
-			ArrayList<Pt> _C, ArrayList<Pt> _D, double _ellapsed_time, EditRatioSlider ratio_slider,Pair L,Pair R) {
+			ArrayList<Pt> _C, ArrayList<Pt> _D, double _ellapsed_time, 
+			EditRatioSlider ratio_slider,Pair L,Pair R, Texture t) {
 		int numFrames = max(max(_A.size(), _B.size()),
 				max(_C.size(), _D.size()));
 		double currentT = (System.nanoTime() / 1000000000.0) - firstFrameT;
@@ -478,7 +479,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		bigR = findFurthestFinger(L,R);
 		ctr_of_roi= findCtr(L,R);
 		proxy_pairs(L,R,ratio_slider.getRatio(),ctr_of_roi);
-		calculate_warp(L,R);
+		calculate_warp(L,R,t);
 	}
 
 	public void animateWarping(MotionPath mp, double _ellapsed_time){
@@ -488,7 +489,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		tracking = computeAnimationFrame(currentT, _ellapsed_time, numFrames);
 	}
 	
-	private void realTimeWarp(Pair L, Pair R) {
+	private void realTimeWarp(Pair L, Pair R,Texture t) {
 		try {
 			int index = Math.min(mController.getHistoryOf(0).size(), 
 					mController.getHistoryOf(1).size());
@@ -510,7 +511,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		ellipse(ctr_of_roi.x,ctr_of_roi.y, littleR*2, littleR*2);
 		ctr_of_roi.show(ctr_of_roi,this);
 		proxy_pairs(L,R,ratio_slider.getRatio(),ctr_of_roi);
-		calculate_warp(L,R);
+		calculate_warp(L,R,t);
 	}
 
 	private void proxy_pairs(Pair l2, Pair r2,float ratio,Pt ctr) {
@@ -542,12 +543,12 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 //		warpVertices(R, 1, roi);
 //	}
 	
-	private void calculate_warp(Pair l2, Pair r2) {
+	private void calculate_warp(Pair l2, Pair r2, Texture t) {
 		roi = d(l2.ctr(this), r2.ctr(this)); // Find the region of influence for the warping
 		l2.evaluate(1, this);
 		r2.evaluate(1, this);
-		warpVertices(l2, 1, roi);// Warp the vertices
-		warpVertices(r2, 1, roi);
+		t.warpVertices(l2, 1, roi);// Warp the vertices
+		t.warpVertices(r2, 1, roi);
 	}
 
 	private Pt findCtr(Pair l2, Pair r2) {
@@ -667,97 +668,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		return result;
 	}
 
-	/************************ TEXTURE *******************************************************************/
-	void resetVertices() { // resets points and laplace vectors
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				G[i][j].setTo(i * w, j * h);
-	}
-
-	void warpVertices(Pt LA0, Pt LB0, Pt LA1, Pt LB1, Pt RA0, Pt RB0, Pt RA1,
-			Pt RB1, float f) {
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				G[i][j] = spirals(LA0, LB0, LA1, LB1, RA0, RB0, RA1, RB1, f,
-						P(i * w, j * h));
-	}
-
-	void warpVertices(Pair L, float f, float roi) {
-		L.prepareToWarp(roi, this); // precompute some values that are the same
-									// for each call to warpDirectly
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				// G[i][j] = L.warp(G[i][j],f,roi,this);
-				L.warpDirectly(G[i][j], f, this);
-	}
-
-	void warpVertices(Pair L, Pair R, float f) {
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				G[i][j] = warp(L, R, f, G[i][j]);
-	}
-
-	void allocVertices() {
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				G[i][j] = P(i * w, j * h);
-			}
-		}
-	}
-
-	void paintImage(PImage myImage) {
-		noStroke();
-		noFill();
-		textureMode(NORMAL); // texture parameters in [0,1]x[0,1]
-		// beginShape(QUADS);
-		for (int i = 0; i < n - 1; i++) {
-			beginShape(QUAD_STRIP);
-			texture(myImage);
-			for (int j = 0; j < n; j++) {
-				vertex(G[i][j].x, G[i][j].y, i * ww, j * hh);
-				vertex(G[i + 1][j].x, G[i + 1][j].y, (i + 1) * ww, j * hh);
-			}
-			endShape();
-		}
-	}
-
-	void drawEdges() {
-		stroke(10, 10, 10);
-		noFill();
-		strokeWeight(2);
-		// beginShape(QUADS);
-		for (int i = 0; i < n - 1; i++) {
-			beginShape(QUAD_STRIP);
-			for (int j = 0; j < n; j++) {
-				vertex(G[i][j].x, G[i][j].y);
-				vertex(G[i + 1][j].x, G[i + 1][j].y);
-			}
-			;
-			endShape();
-		}
-		;
-	}
-
-	void drawVertices() {
-		noStroke();
-		fill(255, 0, 0);
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				show(G[i][j], 1);
-	}
-
-	Pt warp(Pair LPair, Pair R, float f, Pt Q0) {
-		Pt QLt = LPair.warp(Q0, f, this);
-		Pt QRt = R.warp(Q0, f, this);
-		float dL = d(Q0, LPair.ctr(this)), dR = d(Q0, R.ctr(this));
-		//float roi = d(LPair.ctr(this), R.ctr(this));
-		float a = dL / (dL + dR);
-		float cL = sq(cos(a * PI / 2)), cR = sq(sin(a * PI / 2));
-		return P(cL, QLt, cR, QRt);
-	}
-
-	/************************************* END OF TEXTURE **************************/
-	/*****************************************************************************/
+	
 
 	/******************************** Spiral Math *********************************/
 	Pt spirals(Pt LA0, Pt LB0, Pt LA1, Pt LB1, Pt RA0, Pt RB0, Pt RA1, Pt RB1,
