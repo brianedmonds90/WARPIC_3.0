@@ -11,8 +11,8 @@ public class Texture {
 	int n;
 	WarpicActivity wActivity;
 	Pt[][] G; // array of vertices
-	
-	public Texture(float displayWidth, float displayHeight, WarpicActivity wA){
+	MathUtility mu;
+	public Texture(float displayWidth, float displayHeight, WarpicActivity wA,MathUtility mu){
 		n = 50; // size of grid. Must be >2!
 		ww = (float) (1.0 / (n - 1));
 		hh = (float) (1.0 / (n - 1)); // set intial width and height of a cell
@@ -35,17 +35,17 @@ public class Texture {
 			Pt RB1, float f) {
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < n; j++)
-				G[i][j] = wActivity.spirals(LA0, LB0, LA1, LB1, RA0, RB0, RA1, RB1, f,
-						wActivity.P(i * w, j * h));
+				G[i][j] = mu.spirals(LA0, LB0, LA1, LB1, RA0, RB0, RA1, RB1, f,
+						MathUtility.P(i * w, j * h));
 	}
 
 	void warpVertices(Pair L, float f, float roi) {
-		L.prepareToWarp(roi, wActivity); // precompute some values that are the same
+		L.prepareToWarp(roi); // precompute some values that are the same
 									// for each call to warpDirectly
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < n; j++)
 				// G[i][j] = L.warp(G[i][j],f,roi,this);
-				L.warpDirectly(G[i][j], f, wActivity);
+				L.warpDirectly(G[i][j], f);
 	}
 
 	void warpVertices(Pair L, Pair R, float f) {
@@ -57,7 +57,7 @@ public class Texture {
 	void allocVertices() {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				G[i][j] = wActivity.P(i * w, j * h);
+				G[i][j] = mu.P(i * w, j * h);
 			}
 		}
 	}
@@ -104,13 +104,14 @@ public class Texture {
 	}
 
 	Pt warp(Pair LPair, Pair R, float f, Pt Q0) {
-		Pt QLt = LPair.warp(Q0, f, wActivity);
-		Pt QRt = R.warp(Q0, f, wActivity);
-		float dL = wActivity.d(Q0, LPair.ctr(wActivity)), dR = wActivity.d(Q0, R.ctr(wActivity));
+		Pt QLt = LPair.warp(Q0, f);
+		Pt QRt = R.warp(Q0, f);
+		float dL = MathUtility.d(Q0, LPair.ctr()), dR = MathUtility.d(Q0, R.ctr());
 		//float roi = d(LPair.ctr(this), R.ctr(this));
 		float a = dL / (dL + dR);
-		float cL = wActivity.sq(wActivity.cos(a * wActivity.PI / 2)), cR = wActivity.sq(wActivity.sin(a * wActivity.PI / 2));
-		return wActivity.P(cL, QLt, cR, QRt);
+		float cL = WarpicActivity.sq(WarpicActivity.cos(a * WarpicActivity.PI / 2)), 
+				cR = WarpicActivity.sq(WarpicActivity.sin(a * WarpicActivity.PI / 2));
+		return mu.P(cL, QLt, cR, QRt);
 	}
 
 	/************************************* END OF TEXTURE **************************/

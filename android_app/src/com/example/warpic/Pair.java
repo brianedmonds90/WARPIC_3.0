@@ -55,32 +55,32 @@ class Pair {
     return this; 
   }
   
-  Pair evaluate(float t,WarpicActivity helper) { 
-    a = helper.spiralAngle(A0,B0,A1,B1); 
-    s = helper.spiralScale(A0,B0,A1,B1);
-    G = helper.spiralCenter(a, s, A0, A1); 
-    At = helper.L(G,helper.R(A0,t*a,G),helper.pow(s,t));
-    Bt = helper.L(G,helper.R(B0,t*a,G),helper.pow(s,t));
+  Pair evaluate(float t) { 
+    a = MathUtility.spiralAngle(A0,B0,A1,B1); 
+    s = MathUtility.spiralScale(A0,B0,A1,B1);
+    G = MathUtility.spiralCenter(a, s, A0, A1); 
+    At = MathUtility.L(G,MathUtility.R(A0,t*a,G),WarpicActivity.pow(s,t));
+    Bt = MathUtility.L(G,MathUtility.R(B0,t*a,G),WarpicActivity.pow(s,t));
     return this;
     }  
    
-  	Pair evaluate1(float t,WarpicActivity helper) { 
-    a =helper.spiralAngle(A0,B0,A1,B1); 
-    s =helper.spiralScale(A0,B0,A1,B1);
-    G =helper.spiralCenter(a, s, A0, A1); 
+  	Pair evaluate1(float t) { 
+    a =MathUtility.spiralAngle(A0,B0,A1,B1); 
+    s =MathUtility.spiralScale(A0,B0,A1,B1);
+    G =MathUtility.spiralCenter(a, s, A0, A1); 
     return this;
     }
   	
-  	Pt warp(Pt Q, float t, float roi,WarpicActivity helper) {   
-  		float d=helper.d(Q,ctr(helper));
-  		float c=helper.sq(helper.cos(d/roi*helper.PI/2));
+  	Pt warp(Pt Q, float t, float roi) {   
+  		float d=MathUtility.d(Q,ctr());
+  		float c=WarpicActivity.sq(WarpicActivity.cos(d/roi*WarpicActivity.PI/2));
   		if (d>roi) c=0; 
-  		return helper.L(G,helper.R(Q,c*t*a,G),helper.pow(s,c*t));
+  		return MathUtility.L(G,MathUtility.R(Q,c*t*a,G),WarpicActivity.pow(s,c*t));
    }
   		
-  	Pt warp(Pt Q, float t,WarpicActivity helper) {return helper.L(G,helper.R(Q,t*a,G),helper.pow(s,t));} 
+  	Pt warp(Pt Q, float t) {return MathUtility.L(G,MathUtility.R(Q,t*a,G),WarpicActivity.pow(s,t));} 
   
-  	Pt ctr(WarpicActivity helper) {return helper.average(A0,B0);}
+  	Pt ctr() {return MathUtility.average(A0,B0);}
   	
   	void writePairsToFile(File file){
 	  FileWriter fWriter;
@@ -103,23 +103,23 @@ class Pair {
   	
   	
     // ML: update cached data, used by warpDirectly
-    void prepareToWarp(float roi,WarpicActivity helper) {
-      _ctr = ctr(helper); // avoids recomputing this for every vertex in the grid
-      roiFactor = 1/roi*helper.PI/2; // avoids several multiplications and reciprocals per vertex
-      roiSq = helper.sq(roi);
+    void prepareToWarp(float roi) {
+      _ctr = ctr(); // avoids recomputing this for every vertex in the grid
+      roiFactor = 1/roi*WarpicActivity.PI/2; // avoids several multiplications and reciprocals per vertex
+      roiSq = WarpicActivity.sq(roi);
     }
     
-    void warpDirectly(Pt Q, float t, WarpicActivity helper) {   
-      float dSq = helper.d2(Q, _ctr);
+    void warpDirectly(Pt Q, float t) {   
+      float dSq = MathUtility.d2(Q, _ctr);
       float c = 0, ct = 0;
       // if we're outside the region-of-influence, don't bother computing anything
       if(dSq < roiSq) { // sqrt is expensive, so we square the roi and compare that against the point distance
         // to compute the true falloff weight, we do need to take the sqrt,
         // but since most points aren't in the ROI, we avoid calculating a sqrt for them
-        c = helper.sq(helper.cos(helper.sqrt(dSq)*roiFactor));
+        c = WarpicActivity.sq(WarpicActivity.cos(WarpicActivity.sqrt(dSq)*roiFactor));
         ct = c*t;
-        helper.rotateAround(Q, ct*a, G); // updates Q
-        helper.lerpTo(Q, G, 1-helper.pow(s, ct)); // updates Q
+        MathUtility.rotateAround(Q, ct*a, G); // updates Q
+        MathUtility.lerpTo(Q, G, 1-WarpicActivity.pow(s, ct)); // updates Q
       }
     }
 
