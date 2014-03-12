@@ -112,15 +112,15 @@ class Menu {
 			  catch(Exception e){
 				  e.printStackTrace();
 			  }
-			  myPa.getBaryCentricCoords();
-			  myPa.editWarp=!myPa.editWarp;
-			  myPa.showWarp=true;
+			  WarpicActivity.effects_path.getBaryCentricCoords(WarpicActivity.mController);
+			  WarpicActivity.editWarp=!WarpicActivity.editWarp;
+			  WarpicActivity.showWarp=true;
 		  }
 		  else if(saveWarpPath.pressed){
 			  myPa.saveWarpPath();
 		  }
 		  else if(showWarp.pressed){
-			  myPa.showWarp=!myPa.showWarp;
+			  myPa.showWarp=!WarpicActivity.showWarp;
 		  }
 		  else if(showHistory.pressed){
 			  myPa.draw_finger_paths=!myPa.draw_finger_paths;

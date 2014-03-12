@@ -44,13 +44,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	float bigR;
 	static boolean showController, fingersOnScreen, animate, firstPass,
 			saveWarp, showPrimeSpirals, first_load_canned_warp;
-	//Pair L, R; // Declare warping pairs
-	float roi, t, f,littleR;
-	
+		
 	public static boolean grabPoints, writePaths;
-	SurfaceView mySurfaceView;
-	File motionFile, gifFile;;
-	int counter;
+	File motionFile;
 	String displayInfo;
 	boolean firstAnimation = true;
 	boolean showMenu;
@@ -68,10 +64,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	public static boolean compute_bary;
 	public static boolean regrab;
 	public static boolean warp_selected=true;
-	public ArrayList<Weight> weights_a, weights_b, weights_c, weights_d, weights_bounding_box;
 	public static boolean regrab_touched;
 	public boolean draw_finger_paths,edit_ratio;
-	private Pt ctr_of_roi;
+	
 	static public boolean regrab_save;
 	public static MotionPath reset_to_motion_path;
 	public EditRatioSlider ratio_slider;
@@ -94,6 +89,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		imageFilePath = intent.getStringExtra("filePath");
 		myImage = goGetImage(imageFilePath);
 		imageMode(PORTRAIT);
+		
 		fingersOnScreen = false;
 		firstPass = true;
 		animate = false;
@@ -103,20 +99,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		
 		texture = new Texture(displayWidth, displayHeight, this);
 		
-		// *****************Weight lists for Barycentric coords
-		weights_a = new ArrayList<Weight>();
-		weights_b = new ArrayList<Weight>();
-		weights_c = new ArrayList<Weight>();
-		weights_d = new ArrayList<Weight>();
-		weights_bounding_box = new ArrayList<Weight>();
-		// *****************
-
 		showMenu = false;
-		
-		counter = 0;
 		showSpirals = true;
-		
-		
 		menu = new Menu(this);
 		l = new ArrayList<MyMotionEvent>();
 		showController = true;
@@ -138,7 +122,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		draw_finger_paths=false;
 		compute_bary=false;
 		reset_to_motion_path= new MotionPath("RESET");
-		ctr_of_roi= new Pt();
+	
 	
 	}
 
@@ -167,7 +151,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}// end of Synchronized
 
 		if (createNewController) { createNewController();}
-		if(compute_bary){ computeBarys();}
+		if(compute_bary){ effects_path.computeBarys(mController);}
 		if(first_load_canned_warp){
 			//TODO: Doesn't work
 			L.A0.setTo(effects_path.A.get(0));
@@ -185,7 +169,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			}
 			else{
 				//TODO: the user must apply displacement for the canned warp to take effect
-				editWarp(L,R,mController);
+				effects_path.editWarp(L,R,mController);
 			}
 		}
 		
@@ -205,7 +189,6 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 							mController.getHistoryOf(3).size());
 				index--;
 				R = R.setPair(mController.getHistoryOf(2),mController.getHistoryOf(3),index);
-				setPairs(mController);
 				realTimeWarp(texture,L,R);
 				
 			}
@@ -230,7 +213,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 			// Advance the current pairs along the user's path
 			L = L.setPair(effects_path.A, effects_path.B, currFrame);
 			R = R.setPair(effects_path.C, effects_path.D, currFrame);
-			ctr_of_roi= MathUtility.findCtr(L,R);
+			Pt ctr_of_roi= MathUtility.findCtr(L,R);
 			bigR = MathUtility.findFurthestFinger(L,R, ctr_of_roi);
 			float ratio= ratio_slider.getHistory().get(currFrame);
 			//Proxy the pairs based on the current raio of the frame
@@ -268,27 +251,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 	}// End of draw
 
-	private void setPairs(MultiTouchController mCont) {
-		
-	}
 
-	private void editWarp(Pair L, Pair R, MultiTouchController mController) {
-		Pt v1 = mController.getDiskAt(0);
-		Pt v2 = mController.getDiskAt(1);
-		Pt v3 = mController.getDiskAt(2);
-		displaceBoundingBox(effects_path, v1, v2, v3);
-		editWarp(effects_path.A, effects_path.B, effects_path.C,
-		effects_path.D, v1, v2, v3,L,R);
-		effects_path.drawBoundingBox(this);
-		mController.showTriangle(this);
-	}
 
-	private void computeBarys() {
-		clearBarys();
-		getBaryCentricCoords();
-		compute_bary=false;
-		
-	}
+
 
 	private void createNewController() {
 		mController = new MultiTouchController(menu,effects_path, ratio_slider, this);
@@ -331,13 +296,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		grabPoints = false;
 	}
 
-	private void clearBarys() {
-		weights_a.clear();
-		weights_b.clear();
-		weights_c.clear();
-		weights_d.clear();
-		weights_bounding_box.clear();
-	}
+
 
 	private void showFingerHistory(MultiTouchController mController2) {
 		ArrayList<Pt> temp;//= mController2.getHistoryOf(0);
@@ -354,46 +313,9 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		}
 	}
 	
-	private void displaceBoundingBox(MotionPath mp, Pt v1, Pt v2, Pt v3){
-		Weight w= weights_bounding_box.get(0);
-		effects_path.upperLeftCorner=w.to_global_coords(v1, v2, v3);
-		w=weights_bounding_box.get(1);
-		effects_path.upperRightCorner=w.to_global_coords(v1, v2, v3);
-		w=weights_bounding_box.get(2);
-		effects_path.bottomRightCorner=w.to_global_coords(v1, v2, v3);
-		w=weights_bounding_box.get(3);
-		effects_path.bottomLeftCorner=w.to_global_coords(v1, v2, v3);
-	}
+
 	
-	private void editWarp(ArrayList<Pt> a2, ArrayList<Pt> b2, ArrayList<Pt> c2,
-			ArrayList<Pt> d2, Pt v1, Pt v2, Pt v3, Pair L, Pair R) {
-		// Clear the current loactions of the warp motion paths
-		a2.clear();
-		b2.clear();
-		c2.clear();
-		d2.clear();
-		
-		//TODO: Add barycentric translation of bounding box here
-		
-		// Recalculate their location based on the barycentric coordinates
-		for (Weight w : weights_a) {
-			a2.add(w.to_global_coords(v1, v2, v3));
-		}
-		for (Weight w : weights_b) {
-			b2.add(w.to_global_coords(v1, v2, v3));
-		}
-		for (Weight w : weights_c) {
-			c2.add(w.to_global_coords(v1, v2, v3));
-		}
-		for (Weight w : weights_d) {
-			d2.add(w.to_global_coords(v1, v2, v3));
-		}
-		// Set the pairs correctly based on the new coordinates
-		L.A0.setTo(a2.get(0));
-		L.B0.setTo(b2.get(0));
-		R.A0.setTo(c2.get(0));
-		R.B0.setTo(d2.get(0));
-	}
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -440,7 +362,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	private void realTimeWarp(Texture t, Pair l2, Pair r2) {
 		
 		
-		ctr_of_roi= MathUtility.findCtr(l2,r2);
+		Pt ctr_of_roi= MathUtility.findCtr(l2,r2);
 		bigR = MathUtility.findFurthestFinger(l2,r2, ctr_of_roi);
 		//Visualize the region of influence
 		visualizeROI(ctr_of_roi,bigR);
@@ -450,10 +372,10 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 
 	private void visualizeROI(Pt ctr_of_roi2, float bigR2) {
 		stroke(0,255,0);
-		ellipse(ctr_of_roi.x,ctr_of_roi.y, bigR*2, bigR*2);
+		ellipse(ctr_of_roi2.x,ctr_of_roi2.y, bigR*2, bigR*2);
 		float littleR = bigR*ratio_slider.getRatio();
-		ellipse(ctr_of_roi.x,ctr_of_roi.y, littleR*2, littleR*2);
-		ctr_of_roi.show(ctr_of_roi,this);
+		ellipse(ctr_of_roi2.x,ctr_of_roi2.y, littleR*2, littleR*2);
+		ctr_of_roi2.show(ctr_of_roi2,this);
 		
 	}
 
@@ -811,43 +733,8 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	  return list;
 	}
 	
-	public void getBaryCentricCoords() {
-		// compute triangle
-	
-		// Compute The original Barycentric coords for the loaded effects_path
-		for (Pt p : effects_path.A) {
-			System.out.println("point p: "+p);
-			weights_a.add(p.barycentric(mController.getDiskAt(0),
-					mController.getDiskAt(1), mController.getDiskAt(2)));
-		}
-		
-		for (Pt p : effects_path.B) {
-			weights_b.add(p.barycentric(mController.getDiskAt(0),
-					mController.getDiskAt(1), mController.getDiskAt(2)));
-		}
 
-		for (Pt p : effects_path.C) {
-			weights_c.add(p.barycentric(mController.getDiskAt(0),
-					mController.getDiskAt(1), mController.getDiskAt(2)));
-		}
 
-		for (Pt p : effects_path.D) {
-			weights_d.add(p.barycentric(mController.getDiskAt(0),
-					mController.getDiskAt(1), mController.getDiskAt(2)));
-		}
-		getBaryCentricCoordsOfBox();
-	}
-
-	private void getBaryCentricCoordsOfBox() {
-		weights_bounding_box.add(effects_path.upperLeftCorner.barycentric(mController.getDiskAt(0),
-				mController.getDiskAt(1), mController.getDiskAt(2)));
-		weights_bounding_box.add(effects_path.upperRightCorner.barycentric(mController.getDiskAt(0),
-			mController.getDiskAt(1), mController.getDiskAt(2)));
-		weights_bounding_box.add(effects_path.bottomRightCorner.barycentric(mController.getDiskAt(0),
-			mController.getDiskAt(1), mController.getDiskAt(2)));
-		weights_bounding_box.add(effects_path.bottomLeftCorner.barycentric(mController.getDiskAt(0),
-			mController.getDiskAt(1), mController.getDiskAt(2)));	
-	}
 
 	public void saveWarpPath() {
 		
