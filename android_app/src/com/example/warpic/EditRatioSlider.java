@@ -10,6 +10,8 @@ public class EditRatioSlider {
 	public boolean selected;
 	Pt center;
 	ArrayList<Float> history;
+	ArrayList<Double> times;
+	
 	public EditRatioSlider(WarpicActivity w, Pt loc, float len){
 		wp = w;
 		location = loc;
@@ -19,6 +21,7 @@ public class EditRatioSlider {
 		selected = false;
 		ratio_pt_radius = 40;
 		history = new ArrayList<Float>();
+		times = new ArrayList<Double>(); 
 	}
 	
 	public void draw(){
@@ -63,7 +66,6 @@ public class EditRatioSlider {
 		return false;
 	}
 	
-	
 	public void updateHistory(){
 		history.add(getRatio());
 	}
@@ -71,4 +73,5 @@ public class EditRatioSlider {
 	public ArrayList<Float> getHistory(){
 		return history;
 	}
+
 }

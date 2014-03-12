@@ -18,8 +18,10 @@ class Pair {
   float a=0, s=1;
   Pt _ctr;
   float roiFactor, roiSq;
+  Pair pointerPair;
   
-  Pair(){}
+  Pair(){
+  }
   
   Pair(Pt LA0, Pt LB0, Pt LA1, Pt LB1){A0=LA0; B0=LB0; A1=LA1; B1=LB1;}
   
@@ -47,11 +49,11 @@ class Pair {
     pa.strokeWeight(8);
     pa.stroke(255,0,0);
     show0(pa);
-    pa.stroke(0,0,255);
-    showt(pa); 
     pa.stroke(0,255,0);
     show1(pa); 
     pa.noStroke(); 
+//    pa.stroke(0,0,255);
+//    showt(pa); 
     return this; 
   }
   
@@ -135,12 +137,7 @@ class Pair {
 		return ret;
 	}
 
-	public void proxy(float bigR, float littleR, Pt ctr_of_roi,WarpicActivity helper) {
-		A0 = helper.perform_proxy_calculations(A0,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
-		B0 = helper.perform_proxy_calculations(B0,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
-		A1 = helper.perform_proxy_calculations(A1,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
-		B1 = helper.perform_proxy_calculations(B1,bigR, littleR, ctr_of_roi.copy(ctr_of_roi));
-	}
+
 
 	//Used for updating the pairs along a motionpath
 	public Pair setPair(ArrayList<Pt> historyOf, ArrayList<Pt> historyOf2,
@@ -151,7 +148,7 @@ class Pair {
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			
+			System.out.println("Index exception found");
 			return this;
 		}
 		return ret;

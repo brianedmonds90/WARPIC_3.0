@@ -192,7 +192,6 @@ class MultiTouchController {// Used to process the android API touch events for
 	}
 
 	void show(PApplet p) {// shows the disks
-		int num = 0;
 		for (int i = 0; i < mTContainer.size(); i++) {
 			mTContainer.get(i).show(p);
 		}
@@ -263,18 +262,6 @@ class MultiTouchController {// Used to process the android API touch events for
 			p.mul(bigR/littleR);
 			m.history.add(p);
 		}
-	}
-
-	private void proxy_point(ArrayList<Pt> _d, float R, float r, Pt ctr) {
-		
-		Pt temp;
-		for(Pt p: _d){
-			
-			temp = p.subtract(ctr);
-			temp.mul(r/R);
-			p = ctr.add(temp);
-		}
-		
 	}
 	
 	void showEdges(PApplet p) {// Shows the lines inbetween the fingers
@@ -480,7 +467,7 @@ class MultiTouchController {// Used to process the android API touch events for
 		}
 		else if(me.pointerCount>=4){
 			warpicActivity.edit_ratio=false;
-			warpicActivity.fingersOnScreen = true;
+			WarpicActivity.fingersOnScreen = true;
 		}
 	}
 }

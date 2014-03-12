@@ -1,5 +1,6 @@
 package com.example.warpic;
 
+import processing.core.PConstants;
 import processing.core.PImage;
 
 public class Texture {
@@ -57,7 +58,7 @@ public class Texture {
 	void allocVertices() {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				G[i][j] = mu.P(i * w, j * h);
+				G[i][j] = MathUtility.P(i * w, j * h);
 			}
 		}
 	}
@@ -65,10 +66,10 @@ public class Texture {
 	void paintImage(PImage myImage) {
 		wActivity.noStroke();
 		wActivity.noFill();
-		wActivity.textureMode(wActivity.NORMAL); // texture parameters in [0,1]x[0,1]
+		wActivity.textureMode(PConstants.NORMAL); // texture parameters in [0,1]x[0,1]
 		// beginShape(QUADS);
 		for (int i = 0; i < n - 1; i++) {
-			wActivity.beginShape(wActivity.QUAD_STRIP);
+			wActivity.beginShape(PConstants.QUAD_STRIP);
 			wActivity.texture(myImage);
 			for (int j = 0; j < n; j++) {
 				wActivity.vertex(G[i][j].x, G[i][j].y, i * ww, j * hh);
@@ -84,7 +85,7 @@ public class Texture {
 		wActivity.strokeWeight(2);
 		// beginShape(QUADS);
 		for (int i = 0; i < n - 1; i++) {
-			wActivity.beginShape(wActivity.QUAD_STRIP);
+			wActivity.beginShape(PConstants.QUAD_STRIP);
 			for (int j = 0; j < n; j++) {
 				wActivity.vertex(G[i][j].x, G[i][j].y);
 				wActivity.vertex(G[i + 1][j].x, G[i + 1][j].y);
@@ -112,6 +113,14 @@ public class Texture {
 		float cL = WarpicActivity.sq(WarpicActivity.cos(a * WarpicActivity.PI / 2)), 
 				cR = WarpicActivity.sq(WarpicActivity.sin(a * WarpicActivity.PI / 2));
 		return mu.P(cL, QLt, cR, QRt);
+	}
+	
+	public void calculate_warp(Pair l2, Pair r2) {
+		float roi = MathUtility.d(l2.ctr(), r2.ctr()); // Find the region of influence for the warping
+		l2.evaluate(1);
+		r2.evaluate(1);
+		warpVertices(l2, 1, roi);// Warp the vertices
+		warpVertices(r2, 1, roi);
 	}
 
 	/************************************* END OF TEXTURE **************************/

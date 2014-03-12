@@ -99,6 +99,35 @@ public class MotionPath {
 		return rightMost;
 	}
 	
+	/********************************************* Smoothing ***************************/
+	void smooth(){
+		smooth(A);
+		smooth(B);
+		smooth(C);
+		smooth(D);
+	}
+	void smooth(ArrayList<Pt> l) {
+		for (int k = 0; k < 4; k++) {
+			tuck((float) .5, l);
+			tuck((float) -.5, l);
+		}
+	}
+
+	void tuck(float s, ArrayList<Pt> list) {
+		Pt[] S = new Pt[list.size()]; // temporry array
+		// copy of each intermediate point moved by s towards the average of its
+		// neighbors
+		for (int v = 1; v < list.size() - 1; v++)
+			S[v] = MathUtility.P(list.get(v), s, MathUtility.average(list.get(v - 1), list.get(v + 1))); // S
+																					// =
+																					// G
+																					// +
+																					// s((P+N)/2-G)
+		for (int v = 1; v < list.size() - 1; v++)
+			list.set(v, S[v]); // copy back
+	}
+	
+	
 	public float computeUpperMostBound(){
 		float upperMost=-9999999f;
 		for(Pt p: A){

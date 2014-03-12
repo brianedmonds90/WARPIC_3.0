@@ -104,7 +104,7 @@ public class MathUtility {
 		return new Pt((float) x, (float) y);
 	};
 
-	Pt P(Pt A, float s, Pt B) {
+	static Pt P(Pt A, float s, Pt B) {
 		return P(A.x + s * (B.x - A.x), A.y + s * (B.y - A.y));
 	};// ,A.z+s*(B.z-A.z)); }; // A+sAB
 
@@ -283,6 +283,54 @@ public class MathUtility {
 		Q.y = center.y + s * dx + c * dy;
 	}
 
+	
+	static float findFurthestFinger(Pair l2, Pair r2,Pt ctr_of_roi) {
+		float maxDistance = -9999;
+		float currMax= MathUtility.d(l2.A0,ctr_of_roi);
+		if(currMax>maxDistance)
+			maxDistance=currMax;
+		currMax=MathUtility.d(l2.B0,ctr_of_roi);
+		if(currMax>maxDistance)
+			maxDistance=currMax;
+		currMax=MathUtility.d(r2.A0,ctr_of_roi);
+		if(currMax>maxDistance)
+			maxDistance=currMax;
+		currMax=MathUtility.d(r2.B0,ctr_of_roi);
+		if(currMax>maxDistance)
+			maxDistance=currMax;
+		
+		return maxDistance;
+	}
+	static Pt findCtr(Pair l2, Pair r2) {
+		Pt ret = new Pt();
+		ret= MathUtility.average(r2.ctr(),l2.ctr());
+	
+		return ret;
+	}
+	
+	public static void proxy_pairs(Pair l2, Pair r2,float ratio,Pt ctr) {
+		proxy_pair(l2,ratio, new Pt(ctr.x,ctr.y));
+		proxy_pair(r2,ratio, new Pt(ctr.x,ctr.y));
+		
+	}
+	
+	public static void proxy_pair(Pair l2, float ratio, Pt pt) {
+		l2.A0 = perform_proxy_calculations(l2.A0,ratio, pt);
+		l2.B0 = perform_proxy_calculations(l2.B0,ratio, pt);
+		l2.A1 = perform_proxy_calculations(l2.A1,ratio, pt);
+		l2.B1 = perform_proxy_calculations(l2.B1,ratio, pt);
+		
+	}
+	
+	public static Pt perform_proxy_calculations(Pt a0, float ratio, Pt pt) {
+		Pt temp= new Pt();
+		temp = temp.copy(a0.subtract(pt));
+		temp.mul(ratio);
+		temp.add(pt);
+		return temp; 
+	}
+	
+	
 	/*
 	 * ******************************************End of Math
 	 * Utilities***************************************************
