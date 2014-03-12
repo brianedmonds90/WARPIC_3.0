@@ -11,6 +11,7 @@ public class MotionPath {
 	public Pt prevTouch_1;
 	public String unparsed_string;
 	public Pt upperLeftCorner, bottomLeftCorner, bottomRightCorner,upperRightCorner;
+	double ellapsed_time;
 	public MotionPath(String n){
 		name=n;
 		A= new ArrayList<Pt>();
@@ -1014,5 +1015,14 @@ D.add(new Pt(899.6875f,67.06104f));
 		for(Pt p: mp.D){
 			D.add(p);
 		}
+	}
+
+	public void setTo(MultiTouchController mController) {
+		A = mController.getHistoryOf(0);
+		B = mController.getHistoryOf(1);
+		C = mController.getHistoryOf(2);
+		D = mController.getHistoryOf(3);
+		ellapsed_time = mController.getElapsedTime();
+		
 	}
 }

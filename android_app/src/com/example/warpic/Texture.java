@@ -12,8 +12,8 @@ public class Texture {
 	int n;
 	WarpicActivity wActivity;
 	Pt[][] G; // array of vertices
-	MathUtility mu;
-	public Texture(float displayWidth, float displayHeight, WarpicActivity wA,MathUtility mu){
+	
+	public Texture(float displayWidth, float displayHeight, WarpicActivity wA){
 		n = 50; // size of grid. Must be >2!
 		ww = (float) (1.0 / (n - 1));
 		hh = (float) (1.0 / (n - 1)); // set intial width and height of a cell
@@ -36,7 +36,7 @@ public class Texture {
 			Pt RB1, float f) {
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < n; j++)
-				G[i][j] = mu.spirals(LA0, LB0, LA1, LB1, RA0, RB0, RA1, RB1, f,
+				G[i][j] = MathUtility.spirals(LA0, LB0, LA1, LB1, RA0, RB0, RA1, RB1, f,
 						MathUtility.P(i * w, j * h));
 	}
 
@@ -112,7 +112,7 @@ public class Texture {
 		float a = dL / (dL + dR);
 		float cL = WarpicActivity.sq(WarpicActivity.cos(a * WarpicActivity.PI / 2)), 
 				cR = WarpicActivity.sq(WarpicActivity.sin(a * WarpicActivity.PI / 2));
-		return mu.P(cL, QLt, cR, QRt);
+		return MathUtility.P(cL, QLt, cR, QRt);
 	}
 	
 	public void calculate_warp(Pair l2, Pair r2) {

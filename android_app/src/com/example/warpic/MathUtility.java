@@ -5,7 +5,7 @@ public class MathUtility {
 		
 	}
 	/******************************** Spiral Math *********************************/
-	Pt spirals(Pt LA0, Pt LB0, Pt LA1, Pt LB1, Pt RA0, Pt RB0, Pt RA1, Pt RB1,
+	static Pt spirals(Pt LA0, Pt LB0, Pt LA1, Pt LB1, Pt RA0, Pt RB0, Pt RA1, Pt RB1,
 			float f, Pt Q0) {
 		float dL = d(Q0, average(LA0, LB0)), dR = d(Q0, average(RA0, RB0));
 		float roi = d(average(LA0, LB0), average(RA0, RB0));
@@ -19,7 +19,7 @@ public class MathUtility {
 		return P(P(Q0, 1, V(Q0, QLt)), 1, V(Q0, QRt));
 	}
 
-	Pt spiral(Pt A, Pt B, Pt C, Pt D, float t, Pt Q) {
+	static Pt spiral(Pt A, Pt B, Pt C, Pt D, float t, Pt Q) {
 		float a = spiralAngle(A, B, C, D);
 		float s = spiralScale(A, B, C, D);
 		Pt G = spiralCenter(a, s, A, C);
@@ -88,11 +88,11 @@ public class MathUtility {
 		return new Pt(s * A.x, s * A.y);
 	}; // sA
 
-	Pt P(Pt P, Vec V) {
+	static Pt P(Pt P, Vec V) {
 		return P(P.x + V.x, P.y + V.y);
 	} // P+V (P transalted by vector V)
 
-	Pt P(Pt P, float s, Vec V) {
+	static Pt P(Pt P, float s, Vec V) {
 		return P(P, W(s, V));
 	} // P+sV (P transalted by sV)
 
@@ -133,7 +133,7 @@ public class MathUtility {
 		return new Vec(P.x, P.y);
 	}; // make Vector from origin to P
 
-	Vec V(float x, float y) {
+	static Vec V(float x, float y) {
 		return new Vec(x, y);
 	}; // make Vector (x,y)
 
@@ -220,7 +220,7 @@ public class MathUtility {
 			return a;
 	} // adds 2PI to make angle positive
 
-	Vec W(float s, Vec V) {
+	static Vec W(float s, Vec V) {
 		return V(s * V.x, s * V.y);
 	} // sV
 
@@ -236,7 +236,7 @@ public class MathUtility {
 		return W(S(u, U), S(v, V));
 	} // uU+vV ( Linear combination)
 
-	Pt P(float a, Pt A, float b, Pt B) {
+	static Pt P(float a, Pt A, float b, Pt B) {
 		return P(a * A.x + b * B.x, a * A.y + b * B.y);
 	} // aA+bB, (a+b=1)
 
