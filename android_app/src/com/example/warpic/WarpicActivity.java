@@ -32,7 +32,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 	String motionString;
 	
 		
-	boolean showVertices = false, showEdges = true, showTexture = false; // flags for rendering vertices and edges
+	boolean showVertices = false, showEdges = false, showTexture = true; // flags for rendering vertices and edges
 	static boolean showWarp = false;
 
 	static MultiTouchController mController;
@@ -115,6 +115,7 @@ public class WarpicActivity extends PApplet { // PApplet in fact extends
 		effects_path = new MotionPath("smile");
 		ratio_slider = new EditRatioSlider(this, new Pt(displayWidth-40,40), displayHeight-80);
 		mController = new MultiTouchController(menu, effects_path, ratio_slider, this);
+		
 		regrab = false;
 		showPrimeSpirals = false;
 		edit_ratio = false;
