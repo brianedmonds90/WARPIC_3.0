@@ -18,8 +18,7 @@ public class Texture {
 		ww = (float) (1.0 / (n - 1));
 		hh = (float) (1.0 / (n - 1)); // set intial width and height of a cell
 		w = displayWidth * ww;
-		h = displayHeight * hh; // set intial width and height of a cell in
-								// normalized [0,1]x[0,1]
+		h = displayHeight * hh; // set intial width and height of a cell in normalized [0,1]x[0,1]
 		wActivity = wA;
 		G = new Pt[n][n];
 		allocVertices(); // ML: alloc all grid points before starting animation

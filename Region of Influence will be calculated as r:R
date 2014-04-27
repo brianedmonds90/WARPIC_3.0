@@ -1,8 +1,0 @@
-Region of Influence will be calculated as r/R 
-
-where r = a user defined value
-
-and R = the farthest distance between the four user points.
-
-The warp motions will be scaled by r/R and transported to the middle of the screen.
-

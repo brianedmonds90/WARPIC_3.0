@@ -27,6 +27,7 @@ public class MathUtility {
 	}
 
 	static float spiralAngle(Pt A, Pt B, Pt C, Pt D) {
+		//angle = 
 		return angle(V(A, B), V(C, D));
 	}
 
@@ -34,13 +35,13 @@ public class MathUtility {
 		return d(C, D) / d(A, B);
 	}
 
-	static Pt spiralCenter(float a, float z, Pt A, Pt C) {
-		float c = WarpicActivity.cos(a), s = WarpicActivity.sin(a);
-		float D = WarpicActivity.sq(c * z - 1) + WarpicActivity.sq(s * z);
-		float ex = c * z * A.x - C.x - s * z * A.y;
-		float ey = c * z * A.y - C.y + s * z * A.x;
-		float x = (ex * (c * z - 1) + ey * s * z) / D;
-		float y = (ey * (c * z - 1) - ex * s * z) / D;
+	static Pt spiralCenter(float a, float s, Pt A, Pt C) {
+		float c = WarpicActivity.cos(a), q = WarpicActivity.sin(a);
+		float D = WarpicActivity.sq(c * s - 1) + WarpicActivity.sq(q * s);
+		float ex = c * s * A.x - C.x - q * s * A.y;
+		float ey = c * s * A.y - C.y + q * s * A.x;
+		float x = (ex * (c * s - 1) + ey * q * s) / D;
+		float y = (ey * (c * s - 1) - ex * q * s) / D;
 		return P(x, y);
 	}
 
