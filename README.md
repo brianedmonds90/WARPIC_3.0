@@ -3,6 +3,15 @@ WARPIC_3.0
 
 Warpic consists of an Android application and a Web app. The android app handles the user input and can save the animation to be viewed at a later date on a web page.
 
+#####Running the Project
+Download the Android SDK and follow the instructions to get a simple hello world application up and running. http://developer.android.com/sdk/index.html
+
+Set up your dev environment by following these instructions for running processing for android in eclipse. http://blog.onthewings.net/2013/04/25/setting-up-a-processing-android-project-in-eclipse/
+
+Download the project as a .zip file and import it into eclipse. 
+
+Choose run on device.
+
 #####Android Code Components: 
 
 WarpicActivity.java-> Handles the rendering of Warpic. Also intercepts motion events from the Android System and feeds them to the MultiTouchController Object to be handled. Note that the touch events are queued as they are recieved by the system and then handled once per frame.
