@@ -8,7 +8,7 @@ Download the Android SDK and follow the instructions to get a simple hello world
 
 Set up your dev environment by following these instructions for running processing for android in eclipse. http://blog.onthewings.net/2013/04/25/setting-up-a-processing-android-project-in-eclipse/
 
-Download the project as a .zip file and import it into eclipse. 
+Download the project as a .zip file and unzip it. Import the source code into eclipse. 
 
 Choose run on device.
 
